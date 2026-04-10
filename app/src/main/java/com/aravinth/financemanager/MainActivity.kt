@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             FinanceManagerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "Android_app*",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
