@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
     data object Main
 
     @Serializable
-    data object Home
+    data object Home : Screen
 
     @Serializable
     data object Accounting
@@ -17,5 +17,5 @@ import kotlinx.serialization.Serializable
     data object Budgeting
 
     @Serializable
-    data object Assets
+    data object Assets : Screen
 }
