@@ -10,10 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.aravinth.financemanager.ui.screen.AccountingScreen
-import com.aravinth.financemanager.ui.screen.AssetsScreen
-import com.aravinth.financemanager.ui.screen.BudgetingScreen
-import com.aravinth.financemanager.ui.screen.HomeScreen
+import com.aravinth.financemanager.ui.screen.Accounting.AccountingScreen
+import com.aravinth.financemanager.ui.screen.Assets.AssetsScreen
+import com.aravinth.financemanager.ui.screen.Budgeting.BudgetingScreen
+import com.aravinth.financemanager.ui.screen.Home.HomeScreen
 
 
 @Composable

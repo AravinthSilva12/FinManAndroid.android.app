@@ -1,4 +1,4 @@
-package com.aravinth.financemanager.ui.screen
+package com.aravinth.financemanager.ui.screen.Budgeting
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
