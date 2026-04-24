@@ -11,15 +11,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-
 @Module
 @InstallIn(SingletonComponent::class)
-object DatabaseModule {
+data object DatabaseModule {
 
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
+       return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
             "finance_db"
@@ -28,6 +27,6 @@ object DatabaseModule {
 
     @Provides
     fun provideAccountingDao(db: AppDatabase): AccountingDao {
-        return db.accountingDao()
+       return db.accountingDao()
     }
 }
