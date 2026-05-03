@@ -10,6 +10,7 @@ class AddTransactionUseCase @Inject constructor(
     private val repository: AccountingRepo
 ) {
     suspend operator fun invoke(item: Accounting) {
+        if (item.amount <= 0) throw IllegalArgumentException("Transaction amount must be greater than zero")
         repository.addTransaction(item)
     }
 }

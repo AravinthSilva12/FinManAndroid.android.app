@@ -12,6 +12,8 @@ interface AccountingRepo {
 
     fun viewByCategory(category: TransactionCategory): Flow<List<Accounting>>
 
+    fun viewAll(): Flow<List<Accounting>>
+
     suspend fun deleteTransaction(item: Accounting)
 
 }
