@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.aravinth.financemanager.ui.navigation.Screen
 import com.aravinth.financemanager.viewmodel.AccountingViewModel
 
 @Composable
@@ -25,7 +26,7 @@ fun AccountingScreen (navController: NavController, viewModel: AccountingViewMod
 
     //Scaffold:
     Scaffold(modifier = Modifier.fillMaxSize(),
-        floatingActionButton = { ExtendedFloatingActionButton(onClick = {navController.navigate("AddTransaction")},
+        floatingActionButton = { ExtendedFloatingActionButton(onClick = {navController.navigate(Screen.AddTransaction) },
         icon = { Icon(Icons.Default.Add, contentDescription = null) },
         text = { Text("Add Transaction") } )
         }
