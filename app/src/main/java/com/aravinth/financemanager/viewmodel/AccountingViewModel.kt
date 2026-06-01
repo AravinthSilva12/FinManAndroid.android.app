@@ -34,6 +34,10 @@ class AccountingViewModel @Inject constructor(
         amountInput = newValue
     }
 
+    fun onCategorySelect(category: TransactionCategory){
+        categoryInput = category
+    }
+
     fun onAddTransaction() {
         val amount = amountInput.toDoubleOrNull() ?: 0.0
 
