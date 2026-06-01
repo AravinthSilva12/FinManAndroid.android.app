@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -57,7 +58,7 @@ fun AddTransaction(navController: NavController,
                   onValueChange = {},
                   readOnly = true,
                   label = { Text("Category") },
-                  modifier = Modifier.fillMaxSize().menuAnchor()
+                  modifier = Modifier.menuAnchor()
               )
 
               ExposedDropdownMenu(
@@ -76,6 +77,8 @@ fun AddTransaction(navController: NavController,
               }
           }
 
+
+
           //Amount field:
           OutlinedTextField(value = viewModel.amountInput, onValueChange = {newText-> viewModel.onAmountChange(newText)}, label = { Text("Transaction") },
               singleLine = true, keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -93,6 +96,8 @@ fun AddTransaction(navController: NavController,
                   Text("Save Transaction")
               }
           }
+
+
       }
   }
 }

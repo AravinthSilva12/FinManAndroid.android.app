@@ -9,6 +9,8 @@ data class AccountingEntity(
     val id: Int = 0,
     val amount: Double,
     val category: String,
+    val debitAccount: String,
+    val creditAccount: String,
     val type: String,
     val timestamp: Long
 )

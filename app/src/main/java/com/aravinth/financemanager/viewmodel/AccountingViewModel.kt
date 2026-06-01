@@ -25,6 +25,9 @@ class AccountingViewModel @Inject constructor(
          var amountInput by  mutableStateOf("")
          var typeInput by mutableStateOf(TransactionType.DEBIT)
          var categoryInput by mutableStateOf(TransactionCategory.CASH)
+         var debitAccountInput by mutableStateOf("")
+         var creditAccountInput by mutableStateOf("")
+         var searchQueryInput by mutableStateOf("")
 
     //data stream, getTransactionUseCase is operator invoke() type
     val transactions = getTransactionsUseCase()
@@ -57,6 +60,16 @@ class AccountingViewModel @Inject constructor(
                  amountInput = ""
              }
          }
+    }
+
+    //Debit input:
+    fun onDebitChange(newInput: String){
+         debitAccountInput = newInput
+    }
+
+    //Credit input:
+    fun onCreditInput(newInput: String){
+        creditAccountInput = newInput
     }
 
     fun onDeleteTransaction(item: Accounting) {
