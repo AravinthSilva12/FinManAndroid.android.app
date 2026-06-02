@@ -3,14 +3,13 @@ package com.aravinth.financemanager.data.local
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.aravinth.financemanager.domain.model.Accounting
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AccountingDao {
-
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addTransaction(item: AccountingEntity)
 
     @Query("SELECT * FROM accounting_table ORDER BY timestamp DESC")
@@ -24,5 +23,4 @@ interface AccountingDao {
 
     @Delete
     suspend fun deleteTransaction(item: AccountingEntity)
-
 }

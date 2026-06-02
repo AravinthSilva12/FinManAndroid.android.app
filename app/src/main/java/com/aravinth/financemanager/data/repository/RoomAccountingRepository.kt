@@ -1,7 +1,6 @@
 package com.aravinth.financemanager.data.repository
 
 import com.aravinth.financemanager.data.local.AccountingDao
-import com.aravinth.financemanager.data.local.AccountingEntity
 import com.aravinth.financemanager.domain.model.Accounting
 import com.aravinth.financemanager.domain.model.TransactionCategory
 import com.aravinth.financemanager.domain.model.TransactionType
@@ -10,9 +9,7 @@ import com.aravinth.financemanager.domain.model.toEntity
 import com.aravinth.financemanager.domain.repository.AccountingRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.util.Collections.list
 import javax.inject.Inject
-import kotlin.collections.map
 
 class RoomAccountingRepository @Inject constructor(
     private val dao: AccountingDao

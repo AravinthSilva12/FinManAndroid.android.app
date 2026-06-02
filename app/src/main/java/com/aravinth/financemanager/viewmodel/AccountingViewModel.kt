@@ -1,6 +1,7 @@
 package com.aravinth.financemanager.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -27,7 +28,10 @@ class AccountingViewModel @Inject constructor(
          var categoryInput by mutableStateOf(TransactionCategory.CASH)
          var debitAccountInput by mutableStateOf("")
          var creditAccountInput by mutableStateOf("")
+
          var searchQueryInput by mutableStateOf("")
+
+         val availableAccounts = mutableStateListOf("Cash a/c", "Bank a/c")
 
     //data stream, getTransactionUseCase is operator invoke() type
     val transactions = getTransactionsUseCase()
@@ -52,6 +56,8 @@ class AccountingViewModel @Inject constructor(
                  amount = amount,
                  category = categoryInput,
                  type = typeInput,
+                 debitAccount = debitAccountInput,
+                 creditAccount = creditAccountInput,
                  timestamp = System.currentTimeMillis()
              )
 
@@ -64,12 +70,31 @@ class AccountingViewModel @Inject constructor(
 
     //Debit input:
     fun onDebitChange(newInput: String){
-         debitAccountInput = newInput
+        viewModelScope.launch {
+            debitAccountInput = newInput }
     }
 
     //Credit input:
     fun onCreditInput(newInput: String){
-        creditAccountInput = newInput
+        viewModelScope.launch {
+            creditAccountInput = newInput }
+    }
+
+    //Search query input:
+    fun onSearchQuery(newQuery: String){
+           searchQueryInput = newQuery
+    }
+
+    //Account listing:
+    fun addingNewAccount(addNewAccount: String, isDebitSide: Boolean){
+        if(addNewAccount.isBlank() && !availableAccounts.contains(addNewAccount)){
+            availableAccounts.add(addNewAccount)
+        }
+        if(isDebitSide){
+            debitAccountInput = addNewAccount
+        } else{
+           creditAccountInput = addNewAccount
+        }
     }
 
     fun onDeleteTransaction(item: Accounting) {
