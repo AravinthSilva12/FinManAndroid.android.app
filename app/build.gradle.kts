@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.aravinth.financemanager"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.aravinth.financemanager"
