@@ -9,7 +9,7 @@ import com.aravinth.financemanager.data.local.AccountingEntity
          category = TransactionCategory.valueOf(this.category),
          debitAccount = this.debitAccount,
          creditAccount = this.creditAccount,
-         type = TransactionType.valueOf(this.type),
+         transactionType = TransactionType.valueOf(this.transactionType),
          timestamp = this.timestamp
         )
     }
@@ -21,7 +21,7 @@ import com.aravinth.financemanager.data.local.AccountingEntity
           category = this.category.name,
           debitAccount = this.debitAccount,
           creditAccount = this.creditAccount,
-          type = this.type.name,
+          transactionType = this.transactionType.name,
           timestamp = this.timestamp,
         )
     }

@@ -6,6 +6,6 @@ data class Accounting(
     val category: Enum<TransactionCategory>,
     val debitAccount: String,
     val creditAccount: String,
-    val type: Enum<TransactionType>,
+    val transactionType: Enum<TransactionType>,
     val timestamp: Long
 )

@@ -15,7 +15,7 @@ interface AccountingDao {
     @Query("SELECT * FROM accounting_table ORDER BY timestamp DESC")
     fun viewTransactions(): Flow<List<AccountingEntity>>
 
-    @Query("SELECT * FROM accounting_table WHERE type = :type")
+    @Query("SELECT * FROM accounting_table WHERE transactionType = :type")
     fun viewByType(type: String): Flow<List<AccountingEntity>>
 
     @Query("SELECT * FROM accounting_table WHERE category = :category")

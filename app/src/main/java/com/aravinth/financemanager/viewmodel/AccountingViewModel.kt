@@ -55,7 +55,7 @@ class AccountingViewModel @Inject constructor(
                  id = 0,
                  amount = amount,
                  category = categoryInput,
-                 type = typeInput,
+                 transactionType = typeInput,
                  debitAccount = debitAccountInput,
                  creditAccount = creditAccountInput,
                  timestamp = System.currentTimeMillis()
