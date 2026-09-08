@@ -37,6 +37,10 @@ class AccountingViewModel @Inject constructor(
 
          val availableAccounts = mutableStateListOf("Cash a/c", "Bank a/c")
 
+         var noteInput by mutableStateOf("")
+
+         var selectedDateMillis by mutableStateOf(System.currentTimeMillis())
+
     //data stream, getTransactionUseCase is operator invoke() type
     val transactions = getTransactionsUseCase()
 
@@ -115,5 +119,13 @@ class AccountingViewModel @Inject constructor(
 
     fun onCreditSearchQueryChange(newQuery: String){
           creditSearchQuery = newQuery
+    }
+
+    fun onNoteChange(newNote: String){
+        noteInput = newNote
+    }
+
+    fun onDateChange(newDateMillis: Long){
+        selectedDateMillis = newDateMillis
     }
 }
