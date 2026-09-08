@@ -31,6 +31,10 @@ class AccountingViewModel @Inject constructor(
 
          var searchQueryInput by mutableStateOf("")
 
+         var debitSearchQuery by mutableStateOf("")
+
+         var creditSearchQuery by mutableStateOf("")
+
          val availableAccounts = mutableStateListOf("Cash a/c", "Bank a/c")
 
     //data stream, getTransactionUseCase is operator invoke() type
@@ -64,20 +68,22 @@ class AccountingViewModel @Inject constructor(
              viewModelScope.launch {
                  addTransactionUseCase(newEntry)
                  amountInput = ""
+                 debitAccountInput = ""
+                 creditAccountInput = ""
+                 debitSearchQuery = ""
+                 creditSearchQuery = ""
              }
          }
     }
 
     //Debit input:
     fun onDebitChange(newInput: String){
-        viewModelScope.launch {
-            debitAccountInput = newInput }
+        debitAccountInput = newInput
     }
 
     //Credit input:
-    fun onCreditInput(newInput: String){
-        viewModelScope.launch {
-            creditAccountInput = newInput }
+    fun onCreditChange(newInput: String){
+        creditAccountInput = newInput
     }
 
     //Search query input:
@@ -87,7 +93,7 @@ class AccountingViewModel @Inject constructor(
 
     //Account listing:
     fun addingNewAccount(addNewAccount: String, isDebitSide: Boolean){
-        if(addNewAccount.isBlank() && !availableAccounts.contains(addNewAccount)){
+        if(addNewAccount.isNotBlank() && !availableAccounts.contains(addNewAccount)){
             availableAccounts.add(addNewAccount)
         }
         if(isDebitSide){
@@ -101,5 +107,13 @@ class AccountingViewModel @Inject constructor(
          viewModelScope.launch {
              deleteTransactionUseCase(item)
          }
+    }
+
+    fun onDebitSearchQueryChange(newQuery: String){
+          debitSearchQuery = newQuery
+    }
+
+    fun onCreditSearchQueryChange(newQuery: String){
+          creditSearchQuery = newQuery
     }
 }
