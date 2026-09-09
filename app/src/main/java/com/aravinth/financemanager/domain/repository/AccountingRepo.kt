@@ -16,4 +16,6 @@ interface AccountingRepo {
 
     suspend fun deleteTransaction(item: Accounting)
 
+    suspend fun insertAccount(accountName: String)
+    fun getAllAccounts(): Flow<List<String>>
 }

@@ -23,4 +23,11 @@ interface AccountingDao {
 
     @Delete
     suspend fun deleteTransaction(item: AccountingEntity)
+
+    //COA:
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAccount(accountName: ChartOfAccountEntity)
+
+    @Query("SELECT accountName FROM cao_table ORDER BY accountName ASC")
+    fun getAllAccounts(): Flow<List<String>>
 }

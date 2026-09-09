@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aravinth.financemanager.data.repository.RoomAccountingRepository
 import com.aravinth.financemanager.domain.model.Accounting
 import com.aravinth.financemanager.domain.model.TransactionCategory
 import com.aravinth.financemanager.domain.model.TransactionType
@@ -20,112 +21,126 @@ import javax.inject.Inject
 class AccountingViewModel @Inject constructor(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
-    private val deleteTransactionUseCase: DeleteTransactionUseCase
+    private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val accountRepository: RoomAccountingRepository
 ) : ViewModel() {
-    //state variables:
-         var amountInput by  mutableStateOf("")
-         var typeInput by mutableStateOf(TransactionType.DEBIT)
-         var categoryInput by mutableStateOf(TransactionCategory.CASH)
-         var debitAccountInput by mutableStateOf("")
-         var creditAccountInput by mutableStateOf("")
 
-         var searchQueryInput by mutableStateOf("")
+    // State variables
+    var amountInput by mutableStateOf("")
+    var typeInput by mutableStateOf(TransactionType.DEBIT)
+    var categoryInput by mutableStateOf(TransactionCategory.CASH)
+    var debitAccountInput by mutableStateOf("")
+    var creditAccountInput by mutableStateOf("")
 
-         var debitSearchQuery by mutableStateOf("")
+    var searchQueryInput by mutableStateOf("")
+    var debitSearchQuery by mutableStateOf("")
+    var creditSearchQuery by mutableStateOf("")
 
-         var creditSearchQuery by mutableStateOf("")
+    val availableAccounts = mutableStateListOf("Cash a/c", "Bank a/c")
 
-         val availableAccounts = mutableStateListOf("Cash a/c", "Bank a/c")
+    var noteInput by mutableStateOf("")
+    var selectedDateMillis by mutableStateOf(System.currentTimeMillis())
 
-         var noteInput by mutableStateOf("")
+    init {
+        viewModelScope.launch {
+            accountRepository.getAllAccounts().collect { savedList ->
+                val allNames = (listOf("Cash a/c", "Bank a/c") + savedList).distinct()
+                availableAccounts.clear()
+                availableAccounts.addAll(allNames)
+            }
+        }
+    }
 
-         var selectedDateMillis by mutableStateOf(System.currentTimeMillis())
-
-    //data stream, getTransactionUseCase is operator invoke() type
+    // Data stream
     val transactions = getTransactionsUseCase()
 
-    //UI event:
+    // Add new account with DB persistence
+    fun addingNewAccount(addNewAccount: String, isDebitSide: Boolean) {
+        val trimmed = addNewAccount.trim()
+        if (trimmed.isNotBlank()) {
+            if (!availableAccounts.contains(trimmed)) {
+                availableAccounts.add(trimmed)
+            }
+
+            viewModelScope.launch {
+                accountRepository.insertAccount(trimmed)
+            }
+
+            if (isDebitSide) {
+                debitAccountInput = trimmed
+            } else {
+                creditAccountInput = trimmed
+            }
+        }
+    }
+
     fun onAmountChange(newValue: String) {
         amountInput = newValue
     }
 
-    fun onCategorySelect(category: TransactionCategory){
+    fun onCategorySelect(category: TransactionCategory) {
         categoryInput = category
     }
 
     fun onAddTransaction() {
         val amount = amountInput.toDoubleOrNull() ?: 0.0
 
-         if(amount <= 0) {
-             println("Error! Entered value should be greater than Zero")
-         } else {
-             val newEntry = Accounting(
-                 id = 0,
-                 amount = amount,
-                 category = categoryInput,
-                 transactionType = typeInput,
-                 debitAccount = debitAccountInput,
-                 creditAccount = creditAccountInput,
-                 timestamp = System.currentTimeMillis()
-             )
+        if (amount <= 0) {
+            println("Error! Entered value should be greater than Zero")
+        } else {
+            val newEntry = Accounting(
+                id = 0,
+                amount = amount,
+                category = categoryInput,
+                transactionType = typeInput,
+                debitAccount = debitAccountInput,
+                creditAccount = creditAccountInput,
+                timestamp = selectedDateMillis
+            )
 
-             viewModelScope.launch {
-                 addTransactionUseCase(newEntry)
-                 amountInput = ""
-                 debitAccountInput = ""
-                 creditAccountInput = ""
-                 debitSearchQuery = ""
-                 creditSearchQuery = ""
-             }
-         }
+            viewModelScope.launch {
+                addTransactionUseCase(newEntry)
+                amountInput = ""
+                debitAccountInput = ""
+                creditAccountInput = ""
+                debitSearchQuery = ""
+                creditSearchQuery = ""
+                noteInput = ""
+            }
+        }
     }
 
-    //Debit input:
-    fun onDebitChange(newInput: String){
+    fun onDebitChange(newInput: String) {
         debitAccountInput = newInput
     }
 
-    //Credit input:
-    fun onCreditChange(newInput: String){
+    fun onCreditChange(newInput: String) {
         creditAccountInput = newInput
     }
 
-    //Search query input:
-    fun onSearchQuery(newQuery: String){
-           searchQueryInput = newQuery
-    }
-
-    //Account listing:
-    fun addingNewAccount(addNewAccount: String, isDebitSide: Boolean){
-        if(addNewAccount.isNotBlank() && !availableAccounts.contains(addNewAccount)){
-            availableAccounts.add(addNewAccount)
-        }
-        if(isDebitSide){
-            debitAccountInput = addNewAccount
-        } else{
-           creditAccountInput = addNewAccount
-        }
+    fun onSearchQuery(newQuery: String) {
+        searchQueryInput = newQuery
     }
 
     fun onDeleteTransaction(item: Accounting) {
-         viewModelScope.launch {
-             deleteTransactionUseCase(item)
-         }
+        viewModelScope.launch {
+            deleteTransactionUseCase(item)
+        }
     }
 
-    fun onDebitSearchQueryChange(newQuery: String){
-          debitSearchQuery = newQuery
+    fun onDebitSearchQueryChange(newQuery: String) {
+        debitSearchQuery = newQuery
     }
 
-    fun onCreditSearchQueryChange(newQuery: String){
-          creditSearchQuery = newQuery
+    fun onCreditSearchQueryChange(newQuery: String) {
+        creditSearchQuery = newQuery
     }
 
-    fun onNoteChange(newNote: String){
+    fun onNoteChange(newNote: String) {
         noteInput = newNote
     }
 
-    fun onDateChange(newDateMillis: Long){
+    fun onDateChange(newDateMillis: Long) {
         selectedDateMillis = newDateMillis
     }
 }

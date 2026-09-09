@@ -1,6 +1,7 @@
 package com.aravinth.financemanager.data.repository
 
 import com.aravinth.financemanager.data.local.AccountingDao
+import com.aravinth.financemanager.data.local.ChartOfAccountEntity
 import com.aravinth.financemanager.domain.model.Accounting
 import com.aravinth.financemanager.domain.model.TransactionCategory
 import com.aravinth.financemanager.domain.model.TransactionType
@@ -32,5 +33,14 @@ class RoomAccountingRepository @Inject constructor(
 
     override suspend fun deleteTransaction(item: Accounting) {
         dao.deleteTransaction(item.toEntity())
+    }
+
+    //CAO:
+    override suspend fun insertAccount(accountName: String){
+        dao.insertAccount(ChartOfAccountEntity(accountName = accountName))
+    }
+
+    override fun getAllAccounts(): Flow<List<String>> {
+        return dao.getAllAccounts()
     }
 }

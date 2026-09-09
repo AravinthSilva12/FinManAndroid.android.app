@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.aravinth.financemanager.data.local.AccountingDao
 import com.aravinth.financemanager.data.local.AppDatabase
 import com.aravinth.financemanager.data.local.MIGRATION_1_2
+import com.aravinth.financemanager.data.local.MIGRATION_2_3
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +24,7 @@ data object DatabaseModule {
             context,
             AppDatabase::class.java,
             "finance_db"
-        ).addMigrations(MIGRATION_1_2).build()
+        ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()
     }
 
     @Provides

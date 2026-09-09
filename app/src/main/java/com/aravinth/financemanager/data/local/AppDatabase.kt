@@ -5,8 +5,8 @@ import androidx.room.RoomDatabase
 
 
 @Database(
-    entities = [AccountingEntity::class],
-    version = 2,
+    entities = [AccountingEntity::class, ChartOfAccountEntity:: class],
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
