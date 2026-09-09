@@ -3,6 +3,7 @@ package com.aravinth.financemanager.ui.screen.accounting
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
@@ -67,160 +69,170 @@ fun AddTransaction(navController: NavController,
     var newAccountName by remember { mutableStateOf("") }
     var isDebitTarget by remember { mutableStateOf(true) }
     var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = viewModel.selectedDateMillis)
+    val datePickerState =
+        rememberDatePickerState(initialSelectedDateMillis = viewModel.selectedDateMillis)
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "Financial manager",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold)
-                        },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+        modifier = Modifier.fillMaxSize(), contentWindowInsets = WindowInsets(0, 4, 0, 4)
+    ) {innerPadding ->
+            Column(
+                modifier = Modifier.fillMaxSize().padding(innerPadding)
+                    .padding(horizontal = 4.dp, vertical = 4.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Financial manager",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    windowInsets = WindowInsets(0, 0, 0, 0)
+                )
+
+                //Visual Outer shell (card frame):
+                FormFieldCard(label = "Transaction type :") {
+                    //Prime entry type select:
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded }
+                    ) {
+                        OutlinedTextField(
+                            value = viewModel.categoryInput.name,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Category") },
+                            modifier = Modifier.menuAnchor().fillMaxWidth()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            TransactionCategory.entries.forEach { selection ->
+                                DropdownMenuItem(
+                                    text = { Text(text = selection.name) },
+                                    onClick = {
+                                        viewModel.onCategorySelect(selection)
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
-            )
-        }
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(it)
-                .padding(horizontal = 12.dp, vertical = 4.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            //Visual Outer shell (card frame):
-            FormFieldCard(label = "Transaction type :") {
-                //Prime entry type select:
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
-                ) {
+
+                //Card2: Amount:
+                FormFieldCard(label = "Amount :") {
+                    //Amount field:
                     OutlinedTextField(
-                        value = viewModel.categoryInput.name,
+                        modifier = Modifier.fillMaxWidth(),
+                        value = viewModel.amountInput,
+                        onValueChange = { newText -> viewModel.onAmountChange(newText) },
+                        label = { Text("Amount") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(onNext = {
+                            focusManager.moveFocus(
+                                FocusDirection.Down
+                            )
+                        })
+                    )
+                }
+
+                //Card3: Debit Account:
+                FormFieldCard(label = "Debit account :") {
+                    //Debit account Dropdown brick:
+                    SearchableAccountDropdown(
+                        label = "Debit account",
+                        selectedAccount = viewModel.debitAccountInput,
+                        onAccountSelectChange = { viewModel.onDebitChange(it) },
+                        searchQuery = viewModel.debitSearchQuery,
+                        onSearchQueryChange = { viewModel.onDebitSearchQueryChange(it) },
+                        accountsList = viewModel.availableAccounts,
+                        onAddNewAccountClick = {
+                            isDebitTarget = true
+                            showDialog = true
+                        }
+                    )
+                }
+
+                //Card4: Credit Account:
+                FormFieldCard(label = "Credit Account :") {
+                    //Credit account Dropdown brick:
+                    SearchableAccountDropdown(
+                        label = "Credit Account",
+                        selectedAccount = viewModel.creditAccountInput,
+                        onAccountSelectChange = { viewModel.onCreditChange(it) },
+                        searchQuery = viewModel.creditSearchQuery,
+                        onSearchQueryChange = { viewModel.onCreditSearchQueryChange(it) },
+                        accountsList = viewModel.availableAccounts,
+                        onAddNewAccountClick = {
+                            isDebitTarget = false
+                            showDialog = true
+                        }
+                    )
+                }
+
+                //Card5: Date:
+                FormFieldCard(label = "Date :") {
+                    val formattedDate = remember(viewModel.selectedDateMillis) {
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            .format(Date(viewModel.selectedDateMillis))
+                    }
+                    OutlinedTextField(
+                        value = formattedDate,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Category") },
-                        modifier = Modifier.menuAnchor()
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            IconButton(onClick = { showDatePicker = true }) {
+                                Icon(Icons.Default.DateRange, contentDescription = "Select Date")
+                            }
+                        }
                     )
-
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        TransactionCategory.entries.forEach { selection ->
-                            DropdownMenuItem(
-                                text = { Text(text = selection.name) },
-                                onClick = {
-                                    viewModel.onCategorySelect(selection)
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
                 }
-            }
 
-            //Card2: Amount:
-            FormFieldCard(label = "Amount :") {
-                //Amount field:
-                OutlinedTextField(
-                    value = viewModel.amountInput,
-                    onValueChange = { newText -> viewModel.onAmountChange(newText) },
-                    label = { Text("Amount") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(onNext = {
-                        focusManager.moveFocus(
-                            FocusDirection.Down
-                        )
-                    })
-                )
-            }
-
-            //Card3: Debit Account:
-            FormFieldCard(label = "Debit account :") {
-                //Debit account Dropdown brick:
-                SearchableAccountDropdown(
-                    label = "Debit account",
-                    selectedAccount = viewModel.debitAccountInput,
-                    onAccountSelectChange = { viewModel.onDebitChange(it) },
-                    searchQuery = viewModel.debitSearchQuery,
-                    onSearchQueryChange = { viewModel.onDebitSearchQueryChange(it) },
-                    accountsList = viewModel.availableAccounts,
-                    onAddNewAccountClick = {
-                        isDebitTarget = true
-                        showDialog = true
-                    }
-                )
-            }
-
-            //Card4: Credit Account:
-            FormFieldCard(label = "Credit Account :") {
-                //Credit account Dropdown brick:
-                SearchableAccountDropdown(
-                    label = "Credit Account",
-                    selectedAccount = viewModel.creditAccountInput,
-                    onAccountSelectChange = { viewModel.onCreditChange(it) },
-                    searchQuery = viewModel.creditSearchQuery,
-                    onSearchQueryChange = { viewModel.onCreditSearchQueryChange(it) },
-                    accountsList = viewModel.availableAccounts,
-                    onAddNewAccountClick = {
-                        isDebitTarget = false
-                        showDialog = true
-                    }
-                )
-            }
-
-            //Card5: Date:
-            FormFieldCard(label = "Date :") {
-                val formattedDate = remember(viewModel.selectedDateMillis) {
-                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                        .format(Date(viewModel.selectedDateMillis))
+                //Card6: Note:
+                FormFieldCard(label = "Note :") {
+                    OutlinedTextField(
+                        value = viewModel.noteInput,
+                        onValueChange = { viewModel.onNoteChange(it) },
+                        placeholder = { Text("Add transaction notes...") },
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 3
+                    )
                 }
-                OutlinedTextField(
-                    value = formattedDate,
-                    onValueChange = {},
-                    readOnly = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Select Date")
-                        }
-                    }
-                )
-            }
 
-            //Card6: Note:
-            FormFieldCard(label = "Note :"){
-                OutlinedTextField(
-                    value = viewModel.noteInput,
-                    onValueChange = {viewModel.onNoteChange(it)},
-                    placeholder = {Text("Add transaction notes...")},
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 3
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 //Button place (at bottom of form):
-                    Button(onClick = {
+                Button(
+                    onClick = {
                         viewModel.onAddTransaction()
                         navController.popBackStack()
                     },
-                        modifier = Modifier.fillMaxWidth(0.85f)
-                            .height(46.dp)
-                    ) {
-                        Text("Save Transaction", fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold)
-                    }
+                    modifier = Modifier.fillMaxWidth(0.85f)
+                        .height(46.dp)
+                ) {
+                    Text(
+                        "Save Transaction", fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 //Add new account pop-up dialog:
                 if (showDialog) {
@@ -253,31 +265,31 @@ fun AddTransaction(navController: NavController,
                 }
             }
 
-        //Pop-up: Date picker:
-        if(showDatePicker){
-            DatePickerDialog(
-                onDismissRequest = {showDatePicker = false},
-                confirmButton = {
-                    TextButton(onClick = {datePickerState.selectedDateMillis?.let{
-                        viewModel.onDateChange(it)
+            //Pop-up: Date picker:
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            datePickerState.selectedDateMillis?.let {
+                                viewModel.onDateChange(it)
+                            }
+                            showDatePicker = false
+                        }) {
+                            Text("ok")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDatePicker = false }) {
+                            Text("Cancel")
+                        }
                     }
-                        showDatePicker = false
-                    }) {
-                        Text("ok")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = {showDatePicker = false}){
-                        Text("Cancel")
-                    }
+                ) {
+                    DatePicker(state = datePickerState)
                 }
-            ){
-                DatePicker(state = datePickerState)
             }
         }
     }
-}
-
 @Composable
 fun FormFieldCard(label: String,
                   content: @Composable () -> Unit

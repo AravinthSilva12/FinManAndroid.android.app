@@ -4,19 +4,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -42,46 +44,53 @@ fun AccountingScreen (navController: NavController, viewModel: AccountingViewMod
     val transactions by viewModel.transactions.collectAsState(initial = emptyList())
 
     //Scaffold:
-    Scaffold(modifier = Modifier.fillMaxSize(),
+    Scaffold(modifier = Modifier.fillMaxSize(), contentWindowInsets = WindowInsets(2, 4, 2, 4),
         floatingActionButton = {
-                ExtendedFloatingActionButton(
-                    onClick = { navController.navigate(Screen.AddTransaction) },
-                    icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                    text = { Text("Add Transaction") }
-                )
+                FloatingActionButton(
+                    onClick = { navController.navigate(Screen.AddTransaction) })
+                        {
+                    Icon(Icons.Default.Add, contentDescription = "Add Transaction"
+                    )
+                }
         }
     )
-    {
-        Column(modifier = Modifier.fillMaxSize().padding(it)) {
+    {innerPadding ->
+        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)
+        ) {
+                Spacer(modifier = Modifier.height(2.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(2.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    TextButton(onClick = { navController.navigate(Screen.Journal) }) {
+                        Text("Journal", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+                        Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
 
-            Row(modifier = Modifier.fillMaxWidth().padding(2.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly) {
-                TextButton(onClick = { navController.navigate(Screen.Journal)}) {
-                    Text("Journal")
+                    TextButton(onClick = { navController.navigate(Screen.Ledger) }) {
+                        Text("Ledger", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+                        Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
+
+                    TextButton(onClick = { navController.navigate(Screen.FinancialReport) }) {
+                        Text("Report", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
+                        Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
                 }
 
-                TextButton(onClick = { navController.navigate(Screen.Ledger)}) {
-                    Text("Ledger")
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Card(modifier = Modifier.fillMaxWidth().height(250.dp).padding(horizontal = 8.dp)) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Dash board space")
+                    }
                 }
 
-                TextButton(onClick = { navController.navigate(Screen.FinancialReport) }) {
-                    Text("Financial report")
-                }
-            }
-                Spacer(modifier = Modifier.height(16.dp))
-
-            Card(modifier = Modifier.fillMaxWidth().height(150.dp).padding(horizontal = 8.dp)) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                     Text("Dash board space")
-                }
-            }
-
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
             LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 8.dp),
-                contentPadding = PaddingValues(bottom = 80.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                 verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     item{
                         Text("Recent transactions:", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
@@ -91,10 +100,11 @@ fun AccountingScreen (navController: NavController, viewModel: AccountingViewMod
                         .clickable(onClick = {navController.navigate(Screen.Journal)})
                     ) {
                         Box(modifier = Modifier.fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(vertical = 18.dp, horizontal = 16.dp)
                         ) {
                             Text(text = "Amount: ${singeTraction.amount}",
-                                style = MaterialTheme.typography.bodyLarge)
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
