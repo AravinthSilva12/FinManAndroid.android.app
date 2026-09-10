@@ -22,6 +22,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -81,36 +81,59 @@ fun AccountingScreen (navController: NavController, viewModel: AccountingViewMod
 
                 Spacer(modifier = Modifier.height(2.dp))
 
-                Card(modifier = Modifier.fillMaxWidth().height(250.dp).padding(horizontal = 8.dp)) {
+                Card(modifier = Modifier.fillMaxWidth().height(320.dp).padding(horizontal = 8.dp)) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("Dash board space")
                     }
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
             LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 8.dp),
-                 verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    item{
-                        Text("Recent transactions:", fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                    }
-                items(transactions){singeTraction ->
-                    Card(modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal = 4.dp)
-                        .clickable(onClick = {navController.navigate(Screen.Journal)})
+                 verticalArrangement = Arrangement.spacedBy(4.dp))
+            {
+                stickyHeader {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.background
                     ) {
-                        Box(modifier = Modifier.fillMaxWidth()
-                            .padding(vertical = 18.dp, horizontal = 16.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Amount: ${singeTraction.amount}",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold)
+                            Text(
+                                "Recent Transactions",
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            TextButton(onClick = { navController.navigate(Screen.Journal) }) {
+                                Text("View All")
+                            }
+                        }
+                    }
+                }
+
+                        items(transactions) { singeTraction ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(horizontal = 4.dp)
+                                    .clickable(onClick = { navController.navigate(Screen.Journal) })
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .padding(vertical = 18.dp, horizontal = 16.dp)
+                                ) {
+                                    Text(
+                                        text = "${singeTraction.amount}",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
-}
-
-
