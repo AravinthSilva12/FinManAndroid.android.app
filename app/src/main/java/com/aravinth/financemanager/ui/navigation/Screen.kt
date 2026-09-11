@@ -20,6 +20,9 @@ import kotlinx.serialization.Serializable
     data object Journal
 
     @Serializable
+    data class EntryDetailScreen(val transactionId: Long) : Screen
+
+    @Serializable
     data object Ledger
 
     @Serializable
@@ -29,4 +32,5 @@ import kotlinx.serialization.Serializable
 
     @Serializable
     data object Assets : Screen
+
 }

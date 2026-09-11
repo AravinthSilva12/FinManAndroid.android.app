@@ -10,7 +10,8 @@ import com.aravinth.financemanager.data.local.AccountingEntity
          debitAccount = this.debitAccount,
          creditAccount = this.creditAccount,
          transactionType = TransactionType.valueOf(this.transactionType),
-         timestamp = this.timestamp
+         timestamp = this.timestamp,
+         note = this.note
         )
     }
 
@@ -23,5 +24,6 @@ import com.aravinth.financemanager.data.local.AccountingEntity
           creditAccount = this.creditAccount,
           transactionType = this.transactionType.name,
           timestamp = this.timestamp,
+          note = this.note
         )
     }

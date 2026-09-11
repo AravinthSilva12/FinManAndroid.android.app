@@ -1,9 +1,11 @@
 package com.aravinth.financemanager.ui.screen.accounting
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -47,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aravinth.financemanager.domain.model.Accounting
+import com.aravinth.financemanager.ui.navigation.Screen
 import com.aravinth.financemanager.viewmodel.AccountingViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -62,15 +65,15 @@ fun JournalScreen(
     viewModel: AccountingViewModel = hiltViewModel()
 ) {
     val transactions by viewModel.transactions.collectAsState(initial = emptyList())
-    var selectedFilter by remember {mutableStateOf(JournalFilter.ALL)}
-    var entryToDelete by remember {mutableStateOf<Accounting?>(null)}
+    var selectedFilter by remember { mutableStateOf(JournalFilter.ALL) }
+    var entryToDelete by remember { mutableStateOf<Accounting?>(null) }
 
-    //Filter Logic using calendar:
-    val filteredTransactions = remember(transactions, selectedFilter){
+    // Filter Logic using Calendar
+    val filteredTransactions = remember(transactions, selectedFilter) {
         val now = Calendar.getInstance()
-        transactions.filter{entry ->
-            val entryCal = Calendar.getInstance().apply{ timeInMillis = entry.timestamp}
-            when(selectedFilter){
+        transactions.filter { entry ->
+            val entryCal = Calendar.getInstance().apply { timeInMillis = entry.timestamp }
+            when (selectedFilter) {
                 JournalFilter.ALL -> true
                 JournalFilter.TODAY -> {
                     now.get(Calendar.YEAR) == entryCal.get(Calendar.YEAR) &&
@@ -88,11 +91,13 @@ fun JournalScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Journal Entries",
-                    fontWeight = FontWeight.Bold,
-                    style = MaterialTheme.typography.titleLarge
-                )
-            },
+                title = {
+                    Text(
+                        "Journal Entries",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -110,43 +115,45 @@ fun JournalScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
+            // Filter Section
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-              FilterChip(
-                  selected = selectedFilter == JournalFilter.ALL,
-                  onClick = { selectedFilter = JournalFilter.ALL},
-                  label = {Text("All")}
-              )
-              FilterChip(
-                  selected = selectedFilter == JournalFilter.TODAY,
-                  onClick = { selectedFilter = JournalFilter.TODAY },
-                  label = {Text("Today")}
-              )
-              FilterChip(
-                  selected = selectedFilter == JournalFilter.THIS_MONTH,
-                  onClick = { selectedFilter = JournalFilter.THIS_MONTH },
-                  label = {Text("This Month")}
-              )
+                FilterChip(
+                    selected = selectedFilter == JournalFilter.ALL,
+                    onClick = { selectedFilter = JournalFilter.ALL },
+                    label = { Text("All") }
+                )
+                FilterChip(
+                    selected = selectedFilter == JournalFilter.TODAY,
+                    onClick = { selectedFilter = JournalFilter.TODAY },
+                    label = { Text("Today") }
+                )
+                FilterChip(
+                    selected = selectedFilter == JournalFilter.THIS_MONTH,
+                    onClick = { selectedFilter = JournalFilter.THIS_MONTH },
+                    label = { Text("This Month") }
+                )
             }
 
-            //Empty state check against filtered results:
             if (filteredTransactions.isEmpty()) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No journal entries recorded yet.",
+                        text = if (transactions.isEmpty()) "No journal entries recorded yet." else "No entries match this filter.",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else {
-                //Uses filteredTransaction instead of raw transactions:
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                    contentPadding = PaddingValues(
                         start = 12.dp,
                         end = 12.dp,
                         top = 0.dp,
@@ -160,31 +167,36 @@ fun JournalScreen(
                     ) { entry ->
                         JournalEntryCard(
                             entry = entry,
-                            onDeleteClick = { entryToDelete = entry }
+                            onDeleteClick = { entryToDelete = entry },
+                            onCardClick = {
+                                navController.navigate(Screen.EntryDetailScreen(transactionId = entry.id))
+                            }
                         )
                     }
                 }
             }
 
-            //Delete confirmation Dialog:
+            // Delete Dialog
             entryToDelete?.let { entry ->
                 AlertDialog(
                     onDismissRequest = { entryToDelete = null },
-                    title = { Text("Delete this Journal Entry?")},
-                    text = { Text("Are you sure you want to delete this entry? This action automatically updates your Ledger in real time.")},
+                    title = { Text("Delete this Journal Entry?") },
+                    text = { Text("Are you sure you want to delete this entry? This action automatically updates your Ledger in real time.") },
                     confirmButton = {
                         Button(
-                            onClick = { viewModel.onDeleteTransaction(entry)
-                            entryToDelete = null},
+                            onClick = {
+                                viewModel.onDeleteTransaction(entry)
+                                entryToDelete = null
+                            },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
-                                Text("Delete")
-                            }
+                            Text("Delete")
+                        }
                     },
-                            dismissButton = {
-                                TextButton(onClick = { entryToDelete = null }){
-                                    Text("Cancel")
-                            }
+                    dismissButton = {
+                        TextButton(onClick = { entryToDelete = null }) {
+                            Text("Cancel")
+                        }
                     }
                 )
             }
@@ -193,8 +205,11 @@ fun JournalScreen(
 }
 
 @Composable
-fun JournalEntryCard(entry: Accounting,
-                     onDeleteClick: () -> Unit) {
+fun JournalEntryCard(
+    entry: Accounting,
+    onDeleteClick: () -> Unit,
+    onCardClick: () -> Unit
+) {
     val formattedDate = remember(entry.timestamp) {
         SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(entry.timestamp))
     }
@@ -204,14 +219,16 @@ fun JournalEntryCard(entry: Accounting,
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onCardClick),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
         )
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
-            //Header Row : Category, Date, Trash icon button:
+            // Header Row: Category & Date
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -232,53 +249,59 @@ fun JournalEntryCard(entry: Accounting,
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            //Trash Icon:
-            IconButton(
-                onClick = onDeleteClick,
-                modifier = Modifier.size(24.dp)
+            // Main Amount
+            Text(
+                text = formattedAmount,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Bottom Section: Badges on left, Trash icon on bottom-right
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
             ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete Entry",
-                    tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
-                )
-            }
-        }
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AccountBadge(label = "Dr", isDebit = true)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = entry.debitAccount.ifEmpty { "Cash a/c" },
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        AccountBadge(label = "Cr", isDebit = false)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = entry.creditAccount.ifEmpty { "Bank a/c" },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
 
-        // Main Amount:
-        Text(
-            text = formattedAmount,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Account Flow (Debit & Credit badges):
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AccountBadge(label = "Dr", isDebit = true)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = entry.debitAccount.ifEmpty { "Cash a/c" },
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AccountBadge(label = "Cr", isDebit = false)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = entry.creditAccount.ifEmpty { "Bank a/c" },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                // Trash icon placed strictly at bottom-right inside Row
+                IconButton(
+                    onClick = onDeleteClick,
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Entry",
+                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                    )
+                }
             }
         }
     }
 }
+
 @Composable
 private fun AccountBadge(label: String, isDebit: Boolean) {
     val backgroundColor = if (isDebit) {

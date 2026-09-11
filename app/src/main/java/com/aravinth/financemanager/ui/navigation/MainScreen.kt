@@ -10,8 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.aravinth.financemanager.ui.screen.accounting.AccountingScreen
 import com.aravinth.financemanager.ui.screen.accounting.AddTransaction
+import com.aravinth.financemanager.ui.screen.accounting.EntryDetailScreen
 import com.aravinth.financemanager.ui.screen.accounting.FinancialReportScreen
 import com.aravinth.financemanager.ui.screen.accounting.JournalScreen
 import com.aravinth.financemanager.ui.screen.accounting.LedgerScreen
@@ -39,6 +41,10 @@ fun MainScreen(){
             composable<Screen.Budgeting> { BudgetingScreen(navController) }
             composable<Screen.AddTransaction> { AddTransaction(navController) }
             composable<Screen.Journal> { JournalScreen(navController) }
+            composable<Screen.EntryDetailScreen> {backStackEntry ->
+                val route: Screen.EntryDetailScreen = backStackEntry.toRoute()
+                EntryDetailScreen(transactionId = route.transactionId,
+                    navController = navController)}
             composable<Screen.Ledger> { LedgerScreen(navController) }
             composable<Screen.FinancialReport> { FinancialReportScreen(navController) }
         }

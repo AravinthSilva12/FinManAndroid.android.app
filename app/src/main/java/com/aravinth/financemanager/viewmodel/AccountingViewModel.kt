@@ -95,7 +95,8 @@ class AccountingViewModel @Inject constructor(
                 transactionType = typeInput,
                 debitAccount = debitAccountInput,
                 creditAccount = creditAccountInput,
-                timestamp = selectedDateMillis
+                timestamp = selectedDateMillis,
+                note = noteInput
             )
 
             viewModelScope.launch {

@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "accounting_table")
 data class AccountingEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0L,
     val amount: Double,
     val category: String,
     val timestamp: Long,
@@ -17,12 +17,14 @@ data class AccountingEntity(
     @ColumnInfo(defaultValue = "'Unknown'")
     val creditAccount: String,
     @ColumnInfo(defaultValue = "'Unknown'")
-    val transactionType: String
+    val transactionType: String,
+    @ColumnInfo(defaultValue = "''")
+    val note: String = ""
 )
 
 @Entity(tableName = "cao_table", indices = [Index(value = ["accountName"], unique = true)])
 data class ChartOfAccountEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Long = 0L,
     val accountName: String
 )
