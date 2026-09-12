@@ -40,7 +40,11 @@ fun MainScreen(){
             composable<Screen.Accounting> { AccountingScreen(navController) }
             composable<Screen.Budgeting> { BudgetingScreen(navController) }
             composable<Screen.AddTransaction> { AddTransaction(navController) }
-            composable<Screen.Journal> { JournalScreen(navController) }
+            composable<Screen.Journal> {backStackEntry ->
+                val route: Screen.Journal = backStackEntry.toRoute()
+                JournalScreen(
+                    targetTransactionId = route.targetTransactionId,
+                    navController = navController) }
             composable<Screen.EntryDetailScreen> {backStackEntry ->
                 val route: Screen.EntryDetailScreen = backStackEntry.toRoute()
                 EntryDetailScreen(transactionId = route.transactionId,

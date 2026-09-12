@@ -3,7 +3,7 @@ package com.aravinth.financemanager.ui.screen.accounting
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -28,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -36,104 +37,132 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aravinth.financemanager.ui.navigation.Screen
 import com.aravinth.financemanager.viewmodel.AccountingViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
-fun AccountingScreen (navController: NavController, viewModel: AccountingViewModel = hiltViewModel())
-{
-    //State variable:
+fun AccountingScreen(
+    navController: NavController,
+    viewModel: AccountingViewModel = hiltViewModel()
+) {
     val transactions by viewModel.transactions.collectAsState(initial = emptyList())
 
-    //Scaffold:
-    Scaffold(modifier = Modifier.fillMaxSize(), contentWindowInsets = WindowInsets(2, 4, 2, 4),
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets(2, 4, 2, 4),
         floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navController.navigate(Screen.AddTransaction) })
-                        {
-                    Icon(Icons.Default.Add, contentDescription = "Add Transaction"
-                    )
-                }
+            FloatingActionButton(onClick = { navController.navigate(Screen.AddTransaction) }) {
+                Icon(Icons.Default.Add, contentDescription = "Add Transaction")
+            }
         }
-    )
-    {innerPadding ->
-        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)
+    ) { innerPadding ->
+        // ENTIRE SCREEN IS NOW ONE LAZYCOLUMN
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            contentPadding = PaddingValues(bottom = 80.dp) // Keeps last item from hiding behind FAB
         ) {
+            // TOP NAV BUTTONS
+            item {
                 Spacer(modifier = Modifier.height(2.dp))
-
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(2.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    TextButton(onClick = { navController.navigate(Screen.Journal) }) {
+                    TextButton(onClick = { navController.navigate(Screen.Journal()) }) {
                         Text("Journal", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
                         Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null, modifier = Modifier.size(18.dp))
                     }
-
                     TextButton(onClick = { navController.navigate(Screen.Ledger) }) {
                         Text("Ledger", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
                         Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null, modifier = Modifier.size(18.dp))
                     }
-
                     TextButton(onClick = { navController.navigate(Screen.FinancialReport) }) {
                         Text("Report", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium)
                         Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null, modifier = Modifier.size(18.dp))
                     }
                 }
-
                 Spacer(modifier = Modifier.height(2.dp))
+            }
 
-                Card(modifier = Modifier.fillMaxWidth().height(320.dp).padding(horizontal = 8.dp)) {
+            // DASHBOARD CARD
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp)
+                ) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("Dash board space")
                     }
                 }
-
                 Spacer(modifier = Modifier.height(2.dp))
+            }
 
-            LazyColumn(modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 8.dp),
-                 verticalArrangement = Arrangement.spacedBy(4.dp))
-            {
-                stickyHeader {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.background
+            // RECENT TRANSACTIONS STICKY HEADER
+            stickyHeader {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
-                                .padding(horizontal = 8.dp, vertical = 2.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                "Recent Transactions",
-                                fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            TextButton(onClick = { navController.navigate(Screen.Journal) }) {
-                                Text("View All")
-                            }
-                        }
-                    }
-                }
-
-                        items(transactions) { singeTraction ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth()
-                                    .padding(horizontal = 4.dp)
-                                    .clickable(onClick = { navController.navigate(Screen.Journal) })
-                            ) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth()
-                                        .padding(vertical = 18.dp, horizontal = 16.dp)
-                                ) {
-                                    Text(
-                                        text = "${singeTraction.amount}",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold
-                                    )
-                                }
-                            }
+                        Text(
+                            text = "Recent Transactions",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        TextButton(onClick = { navController.navigate(Screen.Journal()) }) {
+                            Text("View All")
                         }
                     }
                 }
             }
+
+            // TRANSACTIONS LIST ITEMS
+            items(transactions.take(5)) { singleTransaction ->
+                val formattedDate = remember(singleTransaction.timestamp) {
+                    SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(singleTransaction.timestamp))
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                        .clickable(onClick = { navController.navigate(Screen.Journal(targetTransactionId = singleTransaction.id)) })
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 18.dp, horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "₹${singleTransaction.amount}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Text(
+                            text = formattedDate,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
         }
+    }
+}
