@@ -13,6 +13,8 @@ import com.aravinth.financemanager.domain.model.TransactionType
 import com.aravinth.financemanager.domain.usecase.AddTransactionUseCase
 import com.aravinth.financemanager.domain.usecase.DeleteTransactionUseCase
 import com.aravinth.financemanager.domain.usecase.GetTransactionsUseCase
+import com.aravinth.financemanager.domain.usecase.GetLedgerAccountsUseCase
+import com.aravinth.financemanager.domain.usecase.GetTAccountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,7 +24,9 @@ class AccountingViewModel @Inject constructor(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
-    private val accountRepository: RoomAccountingRepository
+    private val accountRepository: RoomAccountingRepository,
+    private val getLedgerAccountsUseCase: GetLedgerAccountsUseCase,
+    private val getTAccountUseCase: GetTAccountUseCase
 ) : ViewModel() {
 
     // State variables
@@ -53,7 +57,7 @@ class AccountingViewModel @Inject constructor(
 
     // Data stream
     val transactions = getTransactionsUseCase()
-
+    val ledgerSummaries = getLedgerAccountsUseCase()
     // Add new account with DB persistence
     fun addingNewAccount(addNewAccount: String, isDebitSide: Boolean) {
         val trimmed = addNewAccount.trim()
@@ -144,4 +148,6 @@ class AccountingViewModel @Inject constructor(
     fun onDateChange(newDateMillis: Long) {
         selectedDateMillis = newDateMillis
     }
+
+    fun getTAccountDetail(accountName: String) = getTAccountUseCase(accountName)
 }

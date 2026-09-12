@@ -17,6 +17,7 @@ import com.aravinth.financemanager.ui.screen.accounting.EntryDetailScreen
 import com.aravinth.financemanager.ui.screen.accounting.FinancialReportScreen
 import com.aravinth.financemanager.ui.screen.accounting.JournalScreen
 import com.aravinth.financemanager.ui.screen.accounting.LedgerScreen
+import com.aravinth.financemanager.ui.screen.accounting.TAccountScreen
 import com.aravinth.financemanager.ui.screen.assets.AssetsScreen
 import com.aravinth.financemanager.ui.screen.budgeting.BudgetingScreen
 import com.aravinth.financemanager.ui.screen.home.HomeScreen
@@ -50,6 +51,14 @@ fun MainScreen(){
                 EntryDetailScreen(transactionId = route.transactionId,
                     navController = navController)}
             composable<Screen.Ledger> { LedgerScreen(navController) }
+            composable<Screen.TAccountDetail> { backStackEntry ->
+                val route: Screen.TAccountDetail = backStackEntry.toRoute()
+
+                TAccountScreen(
+                    accountName = route.accountName,
+                    navController = navController
+                )
+            }
             composable<Screen.FinancialReport> { FinancialReportScreen(navController) }
         }
     }
