@@ -29,6 +29,9 @@ import kotlinx.serialization.Serializable
     data class TAccountDetail(val accountName: String)
 
     @Serializable
+    data object TrialBalance : Screen
+
+    @Serializable
     data object FinancialReport
     @Serializable
     data object Budgeting

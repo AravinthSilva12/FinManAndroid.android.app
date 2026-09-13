@@ -1,18 +1,19 @@
 package com.aravinth.financemanager.ui.screen.accounting
 
-import android.R
-import android.graphics.drawable.Icon
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aravinth.financemanager.viewmodel.AccountingViewModel
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +89,7 @@ fun TrialBalanceScreen(
                            TrialBalanceRow(
                                accountName = account.accountName,
                                debitAmount = if(isDebit) account.netBalance else null,
-                               creditAmount = if(!isDebit) Math.abs(account.netBalance) else null
+                               creditAmount = if(!isDebit) abs(account.netBalance) else null
                            )
                        }
                   }
@@ -121,5 +123,27 @@ fun TrialBalanceRow(accountName: String, debitAmount: Double?, creditAmount: Dou
 
 @Composable
 fun TrialBalanceFooter(totalDebit: Double, totalCredit: Double, isBalanced: Boolean){
+val  containerColor = if(isBalanced) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer
+val contentColor = if(isBalanced) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer
+    Column(
+        modifier = Modifier.fillMaxWidth().background(containerColor).padding(16.dp).navigationBarsPadding()
+    ){
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("GRAND TOTAL", modifier = Modifier.weight(2f), fontWeight = FontWeight.ExtraBold, color = contentColor)
+            Text("%.2f".format(java.util.Locale.US, totalDebit), modifier = Modifier.weight(1.2f), textAlign = TextAlign.End,
+                fontWeight = FontWeight.ExtraBold, color = contentColor)
+            Text("%.2f".format(java.util.Locale.US, totalCredit), modifier = Modifier.weight(1.2f), textAlign = TextAlign.End,
+                fontWeight = FontWeight.ExtraBold, color = contentColor)
+        }
 
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = if(isBalanced) "Books are perfectly balanced." else "Warning! - Unbalanced ledgers detected",
+            style = MaterialTheme.typography.labelMedium,
+            color = contentColor,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+    }
 }
