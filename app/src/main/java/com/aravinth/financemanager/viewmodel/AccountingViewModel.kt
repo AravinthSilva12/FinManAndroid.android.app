@@ -8,7 +8,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aravinth.financemanager.data.repository.RoomAccountingRepository
+import com.aravinth.financemanager.domain.model.AccountCategory
+import com.aravinth.financemanager.domain.model.AccountType
 import com.aravinth.financemanager.domain.model.Accounting
+import com.aravinth.financemanager.domain.model.ChartOfAccount
 import com.aravinth.financemanager.domain.model.TransactionCategory
 import com.aravinth.financemanager.domain.model.TransactionType
 import com.aravinth.financemanager.domain.usecase.AddTransactionUseCase
@@ -44,16 +47,20 @@ class AccountingViewModel @Inject constructor(
     var searchQueryInput by mutableStateOf("")
     var debitSearchQuery by mutableStateOf("")
     var creditSearchQuery by mutableStateOf("")
-
     val availableAccounts = mutableStateListOf("Cash a/c", "Bank a/c")
-
     var noteInput by mutableStateOf("")
     var selectedDateMillis by mutableLongStateOf(System.currentTimeMillis())
+
+    //Chart of Accounts form state:
+    var coaNameInput by mutableStateOf("")
+    var coaTypeInput by mutableStateOf(AccountType.ASSET)
+    var coaCategoryInput by mutableStateOf(AccountCategory.CURRENT_ASSET)
+    var coaInfoInput by mutableStateOf("")
 
     init {
         viewModelScope.launch {
             accountRepository.getAllAccounts().collect { savedList ->
-                val allNames = (listOf("Cash a/c", "Bank a/c") + savedList).distinct()
+                val allNames = (listOf("Cash a/c", "Bank a/c") + savedList.map{it.accountName}).distinct()
                 availableAccounts.clear()
                 availableAccounts.addAll(allNames)
             }
@@ -63,27 +70,28 @@ class AccountingViewModel @Inject constructor(
     // Data stream
     val transactions = getTransactionsUseCase()
     val ledgerSummaries = getLedgerAccountsUseCase()
-
     val trialBalanceReport = getTrialBalanceUseCase()
-
     val incomeStatementReport = getIncomeStatementUseCase()
+    val allAccounts = accountRepository.getAllAccounts()
 
-    // Add new account with DB persistence
-    fun addingNewAccount(addNewAccount: String, isDebitSide: Boolean) {
-        val trimmed = addNewAccount.trim()
-        if (trimmed.isNotBlank()) {
-            if (!availableAccounts.contains(trimmed)) {
-                availableAccounts.add(trimmed)
-            }
+    //COA function:
+    fun onCoaNameChange(name: String) { coaNameInput = name }
+    fun onCoaTypeChange(type: AccountType) { coaTypeInput = type }
+    fun onCoaCategoryChange(category: AccountCategory) { coaCategoryInput = category }
+    fun onCoaInfoChange(info: String) { coaInfoInput = info }
 
+    fun savedChartOfAccount() {
+        if(coaNameInput.isNotBlank()) {
             viewModelScope.launch {
-                accountRepository.insertAccount(trimmed)
-            }
-
-            if (isDebitSide) {
-                debitAccountInput = trimmed
-            } else {
-                creditAccountInput = trimmed
+                val newAccount = ChartOfAccount(
+                    accountName = coaNameInput.trim(),
+                    accountType = coaTypeInput,
+                    accountCategory = coaCategoryInput,
+                    additionalInfo = coaInfoInput
+                )
+                accountRepository.insertAccount(newAccount)
+                coaNameInput = ""
+                coaInfoInput = ""
             }
         }
     }

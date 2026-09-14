@@ -15,9 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -53,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.aravinth.financemanager.domain.model.TransactionCategory
+import com.aravinth.financemanager.ui.navigation.Screen
 import com.aravinth.financemanager.viewmodel.AccountingViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -97,6 +96,7 @@ fun AddTransaction(navController: NavController,
                     },
                     windowInsets = WindowInsets(0, 0, 0, 0)
                 )
+            }
 
                 //Visual Outer shell (card frame):
                 FormFieldCard(label = "Transaction type :") {
@@ -162,8 +162,7 @@ fun AddTransaction(navController: NavController,
                         onSearchQueryChange = { viewModel.onDebitSearchQueryChange(it) },
                         accountsList = viewModel.availableAccounts,
                         onAddNewAccountClick = {
-                            isDebitTarget = true
-                            showDialog = true
+                            navController.navigate(Screen.CoaScreen)
                         }
                     )
                 }
@@ -179,8 +178,7 @@ fun AddTransaction(navController: NavController,
                         onSearchQueryChange = { viewModel.onCreditSearchQueryChange(it) },
                         accountsList = viewModel.availableAccounts,
                         onAddNewAccountClick = {
-                            isDebitTarget = false
-                            showDialog = true
+                            navController.navigate(Screen.CoaScreen)
                         }
                     )
                 }
@@ -234,36 +232,6 @@ fun AddTransaction(navController: NavController,
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                //Add new account pop-up dialog:
-                if (showDialog) {
-                    AlertDialog(
-                        onDismissRequest = { showDialog = false },
-                        title = { Text("Add New Account") },
-                        text = {
-                            OutlinedTextField(
-                                value = newAccountName,
-                                onValueChange = { newAccountName = it },
-                                label = { Text("Account Name") },
-                                singleLine = true
-                            )
-                        },
-                        confirmButton = {
-                            Button(onClick = {
-                                viewModel.addingNewAccount(newAccountName, isDebitTarget)
-                                newAccountName = ""
-                                showDialog = false
-                            }) {
-                                Text("Add")
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = { showDialog = false }) {
-                                Text("Cancel")
-                            }
-                        }
-                    )
-                }
-            }
 
             //Pop-up: Date picker:
             if (showDatePicker) {

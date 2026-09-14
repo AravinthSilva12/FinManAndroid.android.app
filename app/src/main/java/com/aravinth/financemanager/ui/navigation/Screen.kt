@@ -38,6 +38,9 @@ import kotlinx.serialization.Serializable
     data object IncomeStatement : Screen
 
     @Serializable
+    data object CoaScreen
+
+    @Serializable
     data object Budgeting
 
     @Serializable

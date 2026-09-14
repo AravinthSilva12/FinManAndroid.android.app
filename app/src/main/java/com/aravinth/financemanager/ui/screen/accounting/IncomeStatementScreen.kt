@@ -1,5 +1,6 @@
 package com.aravinth.financemanager.ui.screen.accounting
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,7 @@ import com.aravinth.financemanager.viewmodel.AccountingViewModel
 import java.util.Locale
 import kotlin.math.abs
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IncomeStatementScreen(navController: NavController,

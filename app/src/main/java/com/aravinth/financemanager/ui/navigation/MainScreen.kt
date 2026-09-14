@@ -64,6 +64,7 @@ fun MainScreen(){
             composable<Screen.TrialBalance> { TrialBalanceScreen(navController)}
             composable<Screen.FinancialReport> { FinancialReportScreen(navController) }
             composable<Screen.IncomeStatement> { IncomeStatementScreen(navController) }
+            composable<Screen.CoaScreen> { Screen.CoaScreen(navController) }
         }
     }
 }

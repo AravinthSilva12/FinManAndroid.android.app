@@ -3,6 +3,7 @@ package com.aravinth.financemanager.domain.model
 
 enum class AccountType {
     DRAWINGS,
+    DIVIDEND,
     EXPENSE,
     ASSET,
     LIABILITY,
@@ -25,5 +26,4 @@ enum class AccountCategory{
 
     DIRECT_EXPENSE,
     OPERATING_EXPENSE
-
 }
