@@ -5,7 +5,6 @@ data class AccountSummary(
     val totalDebit: Double,
     val totalCredit: Double,
     val netBalance: Double
-
 )
 
 data class TAccountDetail(

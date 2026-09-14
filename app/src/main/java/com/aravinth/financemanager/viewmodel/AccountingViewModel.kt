@@ -1,6 +1,7 @@
 package com.aravinth.financemanager.viewmodel
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,9 +13,10 @@ import com.aravinth.financemanager.domain.model.TransactionCategory
 import com.aravinth.financemanager.domain.model.TransactionType
 import com.aravinth.financemanager.domain.usecase.AddTransactionUseCase
 import com.aravinth.financemanager.domain.usecase.DeleteTransactionUseCase
-import com.aravinth.financemanager.domain.usecase.GetTransactionsUseCase
+import com.aravinth.financemanager.domain.usecase.GetIncomeStatementUseCase
 import com.aravinth.financemanager.domain.usecase.GetLedgerAccountsUseCase
 import com.aravinth.financemanager.domain.usecase.GetTAccountUseCase
+import com.aravinth.financemanager.domain.usecase.GetTransactionsUseCase
 import com.aravinth.financemanager.domain.usecase.GetTrialBalanceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -28,7 +30,8 @@ class AccountingViewModel @Inject constructor(
     private val accountRepository: RoomAccountingRepository,
     private val getLedgerAccountsUseCase: GetLedgerAccountsUseCase,
     private val getTAccountUseCase: GetTAccountUseCase,
-    private val getTrialBalanceUseCase: GetTrialBalanceUseCase
+    private val getTrialBalanceUseCase: GetTrialBalanceUseCase,
+    private val getIncomeStatementUseCase: GetIncomeStatementUseCase
 ) : ViewModel() {
 
     // State variables
@@ -45,7 +48,7 @@ class AccountingViewModel @Inject constructor(
     val availableAccounts = mutableStateListOf("Cash a/c", "Bank a/c")
 
     var noteInput by mutableStateOf("")
-    var selectedDateMillis by mutableStateOf(System.currentTimeMillis())
+    var selectedDateMillis by mutableLongStateOf(System.currentTimeMillis())
 
     init {
         viewModelScope.launch {
@@ -62,6 +65,8 @@ class AccountingViewModel @Inject constructor(
     val ledgerSummaries = getLedgerAccountsUseCase()
 
     val trialBalanceReport = getTrialBalanceUseCase()
+
+    val incomeStatementReport = getIncomeStatementUseCase()
 
     // Add new account with DB persistence
     fun addingNewAccount(addNewAccount: String, isDebitSide: Boolean) {

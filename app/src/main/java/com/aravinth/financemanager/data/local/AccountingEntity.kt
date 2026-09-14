@@ -22,9 +22,19 @@ data class AccountingEntity(
     val note: String = ""
 )
 
-@Entity(tableName = "cao_table", indices = [Index(value = ["accountName"], unique = true)])
+@Entity(tableName = "coa_table", indices = [Index(value = ["accountName"], unique = true)])
 data class ChartOfAccountEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,
-    val accountName: String
+    val accountName: String,
+
+    //Saved as Strings in room, converted to Enums by mapper
+    @ColumnInfo(defaultValue = "'ASSET")
+    val accountType: String,
+
+    @ColumnInfo(defaultValue = "'CURRENT_ASSET'")
+    val accountCategory: String,
+
+    @ColumnInfo(defaultValue = "''")
+    val additionalInfo: String = ""
 )

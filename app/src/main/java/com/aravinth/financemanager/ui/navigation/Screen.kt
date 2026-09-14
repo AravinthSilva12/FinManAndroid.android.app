@@ -33,6 +33,10 @@ import kotlinx.serialization.Serializable
 
     @Serializable
     data object FinancialReport
+
+    @Serializable
+    data object IncomeStatement : Screen
+
     @Serializable
     data object Budgeting
 

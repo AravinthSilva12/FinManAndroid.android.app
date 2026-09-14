@@ -15,6 +15,7 @@ import com.aravinth.financemanager.ui.screen.accounting.AccountingScreen
 import com.aravinth.financemanager.ui.screen.accounting.AddTransaction
 import com.aravinth.financemanager.ui.screen.accounting.EntryDetailScreen
 import com.aravinth.financemanager.ui.screen.accounting.FinancialReportScreen
+import com.aravinth.financemanager.ui.screen.accounting.IncomeStatementScreen
 import com.aravinth.financemanager.ui.screen.accounting.JournalScreen
 import com.aravinth.financemanager.ui.screen.accounting.LedgerScreen
 import com.aravinth.financemanager.ui.screen.accounting.TAccountScreen
@@ -62,6 +63,7 @@ fun MainScreen(){
             }
             composable<Screen.TrialBalance> { TrialBalanceScreen(navController)}
             composable<Screen.FinancialReport> { FinancialReportScreen(navController) }
+            composable<Screen.IncomeStatement> { IncomeStatementScreen(navController) }
         }
     }
 }

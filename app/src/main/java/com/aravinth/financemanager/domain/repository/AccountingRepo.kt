@@ -1,6 +1,7 @@
 package com.aravinth.financemanager.domain.repository
 
 import com.aravinth.financemanager.domain.model.Accounting
+import com.aravinth.financemanager.domain.model.ChartOfAccount
 import com.aravinth.financemanager.domain.model.TransactionCategory
 import com.aravinth.financemanager.domain.model.TransactionType
 import kotlinx.coroutines.flow.Flow
@@ -16,6 +17,6 @@ interface AccountingRepo {
 
     suspend fun deleteTransaction(item: Accounting)
 
-    suspend fun insertAccount(accountName: String)
-    fun getAllAccounts(): Flow<List<String>>
+    suspend fun insertAccount(account: ChartOfAccount)
+    fun getAllAccounts(): Flow<List<ChartOfAccount>>
 }

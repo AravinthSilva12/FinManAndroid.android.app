@@ -26,8 +26,8 @@ interface AccountingDao {
 
     //COA:
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAccount(accountName: ChartOfAccountEntity)
+    suspend fun insertAccount(account: ChartOfAccountEntity)
 
-    @Query("SELECT accountName FROM cao_table ORDER BY accountName ASC")
-    fun getAllAccounts(): Flow<List<String>>
+    @Query("SELECT * FROM coa_table ORDER BY accountName ASC")
+    fun getAllAccounts(): Flow<List<ChartOfAccountEntity>>
 }
