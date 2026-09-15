@@ -21,6 +21,9 @@ interface AccountingDao {
     @Query("SELECT * FROM accounting_table WHERE category = :category")
     fun viewByCategory(category: String): Flow<List<AccountingEntity>>
 
+    @Query("SELECT * FROM accounting_table WHERE timestamp BETWEEN :startDate AND :endDate ORDER BY timestamp DESC")
+    fun viewTransactionsByDateRange(startDate: Long, endDate: Long): Flow<List<AccountingEntity>>
+
     @Delete
     suspend fun deleteTransaction(item: AccountingEntity)
 

@@ -20,6 +20,9 @@ import kotlinx.serialization.Serializable
     data class Journal(val targetTransactionId: Long = -1L) : Screen
 
     @Serializable
+    data object HistoryScreen
+
+    @Serializable
     data class EntryDetailScreen(val transactionId: Long = -1L) : Screen
 
     @Serializable

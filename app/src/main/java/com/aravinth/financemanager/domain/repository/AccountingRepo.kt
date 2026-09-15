@@ -15,6 +15,8 @@ interface AccountingRepo {
 
     fun viewAll(): Flow<List<Accounting>>
 
+    fun viewTransactionByDateRange(startDate: Long, endDate: Long): Flow<List<Accounting>>
+
     suspend fun deleteTransaction(item: Accounting)
 
     suspend fun insertAccount(account: ChartOfAccount)

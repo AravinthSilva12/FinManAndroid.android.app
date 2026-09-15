@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -53,12 +54,10 @@ import androidx.navigation.NavController
 import com.aravinth.financemanager.domain.model.Accounting
 import com.aravinth.financemanager.ui.navigation.Screen
 import com.aravinth.financemanager.viewmodel.AccountingViewModel
+import com.aravinth.financemanager.viewmodel.DateFilter
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-
-enum class JournalFilter { ALL, TODAY, THIS_MONTH }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,35 +66,17 @@ fun JournalScreen(
     targetTransactionId: Long = -1L,
     viewModel: AccountingViewModel = hiltViewModel()
 ) {
+    //Observer the reactive transactions and filter state from viewmodel:
     val transactions by viewModel.transactions.collectAsState(initial = emptyList())
-    var selectedFilter by remember { mutableStateOf(JournalFilter.ALL) }
+    val currentFilter by viewModel.currentFilter.collectAsState()
     var entryToDelete by remember { mutableStateOf<Accounting?>(null) }
 
     val listState = rememberLazyListState()
 
-    // Filter Logic using Calendar
-    val filteredTransactions = remember(transactions, selectedFilter) {
-        val now = Calendar.getInstance()
-        transactions.filter { entry ->
-            val entryCal = Calendar.getInstance().apply { timeInMillis = entry.timestamp }
-            when (selectedFilter) {
-                JournalFilter.ALL -> true
-                JournalFilter.TODAY -> {
-                    now.get(Calendar.YEAR) == entryCal.get(Calendar.YEAR) &&
-                            now.get(Calendar.DAY_OF_YEAR) == entryCal.get(Calendar.DAY_OF_YEAR)
-                }
-                JournalFilter.THIS_MONTH -> {
-                    now.get(Calendar.YEAR) == entryCal.get(Calendar.YEAR) &&
-                            now.get(Calendar.MONTH) == entryCal.get(Calendar.MONTH)
-                }
-            }
-        }
-    }
-
     // Auto-scroll to target transaction index on launch
-    LaunchedEffect(filteredTransactions, targetTransactionId) {
+    LaunchedEffect(transactions, targetTransactionId) {
         if (targetTransactionId != -1L) {
-            val targetIndex = filteredTransactions.indexOfFirst { it.id == targetTransactionId }
+            val targetIndex = transactions.indexOfFirst { it.id == targetTransactionId }
             if (targetIndex >= 0) {
                 // Adjust index slightly if you want to account for the filter chip item at index 0
                 listState.animateScrollToItem(index = targetIndex + 1)
@@ -122,6 +103,15 @@ fun JournalScreen(
                         )
                     }
                 },
+                actions = {
+                    IconButton(onClick = { navController.navigate(Screen.HistoryScreen)}) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.History,
+                            contentDescription = "View Full History"
+                        )
+                    }
+                },
+
                 windowInsets = WindowInsets(top = 0.dp, bottom = 0.dp)
             )
         }
@@ -144,25 +134,25 @@ fun JournalScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     FilterChip(
-                        selected = selectedFilter == JournalFilter.ALL,
-                        onClick = { selectedFilter = JournalFilter.ALL },
+                        selected = currentFilter == DateFilter.ALL,
+                        onClick = { viewModel.setDateFilter(DateFilter.ALL) },
                         label = { Text("All") }
                     )
                     FilterChip(
-                        selected = selectedFilter == JournalFilter.TODAY,
-                        onClick = { selectedFilter = JournalFilter.TODAY },
+                        selected = currentFilter == DateFilter.TODAY,
+                        onClick = { viewModel.setDateFilter(DateFilter.TODAY) },
                         label = { Text("Today") }
                     )
                     FilterChip(
-                        selected = selectedFilter == JournalFilter.THIS_MONTH,
-                        onClick = { selectedFilter = JournalFilter.THIS_MONTH },
+                        selected = currentFilter == DateFilter.THIS_MONTH,
+                        onClick = { viewModel.setDateFilter(DateFilter.THIS_MONTH) },
                         label = { Text("This Month") }
                     )
                 }
             }
 
             // EMPTY STATE OR LIST ITEMS
-            if (filteredTransactions.isEmpty()) {
+            if (transactions.isEmpty()) {
                 item {
                     Box(
                         modifier = Modifier
@@ -179,7 +169,7 @@ fun JournalScreen(
                 }
             } else {
                 items(
-                    items = filteredTransactions,
+                    items = transactions,
                     key = { entry -> entry.id }
                 ) { entry ->
                     JournalEntryCard(

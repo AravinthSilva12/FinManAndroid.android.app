@@ -13,9 +13,12 @@ class GetTransactionsUseCase @Inject constructor(
 ) {
     operator fun invoke(
         type: TransactionType? = null,
-        category: TransactionCategory? = null
+        category: TransactionCategory? = null,
+        startDate: Long? = null,
+        endDate: Long? = null
     ): Flow<List<Accounting>> {
         val dataFlow = when {
+            startDate != null && endDate != null -> repository.viewTransactionByDateRange(startDate, endDate)
             type != null -> repository.viewByType(type)
             category != null -> repository.viewByCategory(category)
             else -> repository.viewAll()

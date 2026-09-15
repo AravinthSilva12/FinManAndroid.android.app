@@ -16,14 +16,21 @@ import com.aravinth.financemanager.domain.model.TransactionCategory
 import com.aravinth.financemanager.domain.model.TransactionType
 import com.aravinth.financemanager.domain.usecase.AddTransactionUseCase
 import com.aravinth.financemanager.domain.usecase.DeleteTransactionUseCase
+import com.aravinth.financemanager.domain.usecase.GetBalanceSheetUseCase
 import com.aravinth.financemanager.domain.usecase.GetIncomeStatementUseCase
 import com.aravinth.financemanager.domain.usecase.GetLedgerAccountsUseCase
 import com.aravinth.financemanager.domain.usecase.GetTAccountUseCase
 import com.aravinth.financemanager.domain.usecase.GetTransactionsUseCase
 import com.aravinth.financemanager.domain.usecase.GetTrialBalanceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
+
+enum class DateFilter { TODAY, THIS_MONTH, ALL}
 
 @HiltViewModel
 class AccountingViewModel @Inject constructor(
@@ -34,10 +41,15 @@ class AccountingViewModel @Inject constructor(
     private val getLedgerAccountsUseCase: GetLedgerAccountsUseCase,
     private val getTAccountUseCase: GetTAccountUseCase,
     private val getTrialBalanceUseCase: GetTrialBalanceUseCase,
-    private val getIncomeStatementUseCase: GetIncomeStatementUseCase
+    private val getIncomeStatementUseCase: GetIncomeStatementUseCase,
+    private val getBalanceSheetUseCase: GetBalanceSheetUseCase
 ) : ViewModel() {
 
-    // State variables
+    //Filter State:
+    val currentFilter = MutableStateFlow(DateFilter.ALL)
+    var showFilterChips by mutableStateOf(false)
+
+    //Transaction form state:
     var amountInput by mutableStateOf("")
     var typeInput by mutableStateOf(TransactionType.DEBIT)
     var categoryInput by mutableStateOf(TransactionCategory.CASH)
@@ -51,11 +63,13 @@ class AccountingViewModel @Inject constructor(
     var noteInput by mutableStateOf("")
     var selectedDateMillis by mutableLongStateOf(System.currentTimeMillis())
 
+
     //Chart of Accounts form state:
     var coaNameInput by mutableStateOf("")
     var coaTypeInput by mutableStateOf(AccountType.ASSET)
     var coaCategoryInput by mutableStateOf(AccountCategory.CURRENT_ASSET)
     var coaInfoInput by mutableStateOf("")
+
 
     init {
         viewModelScope.launch {
@@ -68,11 +82,84 @@ class AccountingViewModel @Inject constructor(
     }
 
     // Data stream
-    val transactions = getTransactionsUseCase()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val transactions = currentFilter.flatMapLatest {filter ->
+        when (filter) {
+            DateFilter.TODAY -> {
+                val (start, end) = getTodayRange()
+                getTransactionsUseCase(startDate = start, endDate = end)
+            }
+            DateFilter.THIS_MONTH -> {
+                val (start, end) = getMonthRange()
+                getTransactionsUseCase(startDate = start, endDate = end)
+            }
+            DateFilter.ALL -> getTransactionsUseCase()
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val balanceSheetReport = currentFilter.flatMapLatest {filter ->
+        when (filter) {
+            DateFilter.TODAY -> {
+                val (start, end) = getTodayRange()
+                getBalanceSheetUseCase(startDate = start, endDate = end)
+            }
+            DateFilter.THIS_MONTH -> {
+                val (start, end) = getMonthRange()
+                getBalanceSheetUseCase(startDate = start, endDate = end)
+            }
+            DateFilter.ALL -> getBalanceSheetUseCase()
+        }
+    }
+
     val ledgerSummaries = getLedgerAccountsUseCase()
     val trialBalanceReport = getTrialBalanceUseCase()
     val incomeStatementReport = getIncomeStatementUseCase()
     val allAccounts = accountRepository.getAllAccounts()
+
+
+    //Filter logic:
+    fun setDateFilter(filter: DateFilter) {
+        currentFilter.value = filter
+    }
+
+    fun toggleFilterVisibility() {
+        showFilterChips = !showFilterChips
+    }
+
+    private fun getTodayRange(): Pair<Long, Long> {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val start = calendar.timeInMillis
+
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+        val end = calendar.timeInMillis
+        return Pair(start, end)
+    }
+
+    private fun getMonthRange(): Pair<Long, Long> {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val start = calendar.timeInMillis
+
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+        val end = calendar.timeInMillis
+        return Pair(start, end)
+    }
 
     //COA function:
     fun onCoaNameChange(name: String) { coaNameInput = name }
@@ -96,6 +183,7 @@ class AccountingViewModel @Inject constructor(
         }
     }
 
+    //Transaction functions:
     fun onAmountChange(newValue: String) {
         amountInput = newValue
     }

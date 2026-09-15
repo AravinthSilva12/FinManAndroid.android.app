@@ -31,6 +31,10 @@ class RoomAccountingRepository @Inject constructor(
         return dao.viewByCategory(category.name).map{list-> list.map {it.toDomain()}}
     }
 
+    override fun viewTransactionByDateRange(startDate: Long, endDate: Long): Flow<List<Accounting>> {
+        return dao.viewTransactionsByDateRange(startDate, endDate).map{it -> it.map{it.toDomain()}}
+    }
+
     override suspend fun deleteTransaction(item: Accounting) {
         dao.deleteTransaction(item.toEntity())
     }

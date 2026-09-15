@@ -13,8 +13,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.aravinth.financemanager.ui.screen.accounting.AccountingScreen
 import com.aravinth.financemanager.ui.screen.accounting.AddTransaction
+import com.aravinth.financemanager.ui.screen.accounting.CoaScreen
 import com.aravinth.financemanager.ui.screen.accounting.EntryDetailScreen
 import com.aravinth.financemanager.ui.screen.accounting.FinancialReportScreen
+import com.aravinth.financemanager.ui.screen.accounting.HistoryScreen
 import com.aravinth.financemanager.ui.screen.accounting.IncomeStatementScreen
 import com.aravinth.financemanager.ui.screen.accounting.JournalScreen
 import com.aravinth.financemanager.ui.screen.accounting.LedgerScreen
@@ -48,6 +50,7 @@ fun MainScreen(){
                 JournalScreen(
                     targetTransactionId = route.targetTransactionId,
                     navController = navController) }
+            composable<Screen.HistoryScreen> { HistoryScreen(navController)}
             composable<Screen.EntryDetailScreen> {backStackEntry ->
                 val route: Screen.EntryDetailScreen = backStackEntry.toRoute()
                 EntryDetailScreen(transactionId = route.transactionId,
@@ -64,7 +67,7 @@ fun MainScreen(){
             composable<Screen.TrialBalance> { TrialBalanceScreen(navController)}
             composable<Screen.FinancialReport> { FinancialReportScreen(navController) }
             composable<Screen.IncomeStatement> { IncomeStatementScreen(navController) }
-            composable<Screen.CoaScreen> { Screen.CoaScreen(navController) }
+            composable<Screen.CoaScreen> { CoaScreen(navController) }
         }
     }
 }
