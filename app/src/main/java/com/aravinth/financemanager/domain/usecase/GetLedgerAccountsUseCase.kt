@@ -15,7 +15,7 @@ class GetLedgerAccountsUseCase @Inject constructor(
         val transactionsFlow = transactionRepo.viewAll()
         val accountsFlow = accountRepo.getAllAccounts()
         return combine(transactionsFlow, accountsFlow) {transactions, savedAccounts ->
-            val allAccounts = (listOf("Cash a/c", "Bank a/c") + savedAccounts).distinct()
+            val allAccounts = (listOf("Cash a/c", "Bank a/c") + savedAccounts.map{it.accountName}).distinct()
 
             allAccounts.map { accountName ->
                 val totalDebit = transactions.filter{it.debitAccount.ifEmpty{"Cash a/c"} == accountName}

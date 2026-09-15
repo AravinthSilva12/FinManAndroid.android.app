@@ -15,6 +15,7 @@ import com.aravinth.financemanager.domain.model.ChartOfAccount
 import com.aravinth.financemanager.domain.model.TransactionCategory
 import com.aravinth.financemanager.domain.model.TransactionType
 import com.aravinth.financemanager.domain.usecase.AddTransactionUseCase
+import com.aravinth.financemanager.domain.usecase.CloseAccountingPeriodUseCase
 import com.aravinth.financemanager.domain.usecase.DeleteTransactionUseCase
 import com.aravinth.financemanager.domain.usecase.GetBalanceSheetUseCase
 import com.aravinth.financemanager.domain.usecase.GetIncomeStatementUseCase
@@ -42,7 +43,9 @@ class AccountingViewModel @Inject constructor(
     private val getTAccountUseCase: GetTAccountUseCase,
     private val getTrialBalanceUseCase: GetTrialBalanceUseCase,
     private val getIncomeStatementUseCase: GetIncomeStatementUseCase,
-    private val getBalanceSheetUseCase: GetBalanceSheetUseCase
+    private val getBalanceSheetUseCase: GetBalanceSheetUseCase,
+    private val closeAccountingPeriodUseCase: CloseAccountingPeriodUseCase
+
 ) : ViewModel() {
 
     //Filter State:
@@ -256,4 +259,10 @@ class AccountingViewModel @Inject constructor(
     }
 
     fun getTAccountDetail(accountName: String) = getTAccountUseCase(accountName)
+
+    fun onCloseAccountingPeriod(closingDateMillis: Long = System.currentTimeMillis()) {
+        viewModelScope.launch {
+            closeAccountingPeriodUseCase(closingDateMillis)
+        }
+    }
 }

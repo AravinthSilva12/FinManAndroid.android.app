@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.aravinth.financemanager.ui.screen.accounting.AccountingScreen
 import com.aravinth.financemanager.ui.screen.accounting.AddTransaction
+import com.aravinth.financemanager.ui.screen.accounting.BalanceSheetScreen
 import com.aravinth.financemanager.ui.screen.accounting.CoaScreen
 import com.aravinth.financemanager.ui.screen.accounting.EntryDetailScreen
 import com.aravinth.financemanager.ui.screen.accounting.FinancialReportScreen
@@ -67,6 +68,7 @@ fun MainScreen(){
             composable<Screen.TrialBalance> { TrialBalanceScreen(navController)}
             composable<Screen.FinancialReport> { FinancialReportScreen(navController) }
             composable<Screen.IncomeStatement> { IncomeStatementScreen(navController) }
+            composable<Screen.BalanceSheetScreen> { BalanceSheetScreen(navController)}
             composable<Screen.CoaScreen> { CoaScreen(navController) }
         }
     }

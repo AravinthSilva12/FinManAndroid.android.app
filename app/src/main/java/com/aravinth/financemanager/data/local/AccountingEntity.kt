@@ -29,7 +29,7 @@ data class ChartOfAccountEntity(
     val accountName: String,
 
     //Saved as Strings in room, converted to Enums by mapper
-    @ColumnInfo(defaultValue = "'ASSET")
+    @ColumnInfo(defaultValue = "'ASSET'")
     val accountType: String,
 
     @ColumnInfo(defaultValue = "'CURRENT_ASSET'")

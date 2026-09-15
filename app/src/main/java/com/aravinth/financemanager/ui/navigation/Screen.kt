@@ -41,6 +41,9 @@ import kotlinx.serialization.Serializable
     data object IncomeStatement : Screen
 
     @Serializable
+    data object BalanceSheetScreen
+
+    @Serializable
     data object CoaScreen
 
     @Serializable
