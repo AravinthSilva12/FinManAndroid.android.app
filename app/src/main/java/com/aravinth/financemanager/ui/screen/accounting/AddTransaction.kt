@@ -110,7 +110,7 @@ fun AddTransaction(
         ) {
 
             // Card 1: Transaction Type
-            FormFieldCard(label = "Transaction type :") {
+            FormFieldCard(label = "Journal Book_Type :") {
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded }

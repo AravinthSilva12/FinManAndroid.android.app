@@ -206,28 +206,18 @@ fun CoaScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = account.accountName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
 
-                        // Layout updated to align Delete button to the end
+                        // 1. Title Row (Now contains the Title AND the Delete Icon)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                SuggestionChip(
-                                    onClick = { },
-                                    label = { Text(account.accountType.name) }
-                                )
-                                SuggestionChip(
-                                    onClick = { },
-                                    label = { Text(account.accountCategory.name) },
-                                    colors = SuggestionChipDefaults.suggestionChipColors(
-                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                                    )
-                                )
-                            }
+                            Text(
+                                text = account.accountName,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
 
                             IconButton(
                                 onClick = {
@@ -244,6 +234,24 @@ fun CoaScreen(
                             }
                         }
 
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // 2. Chips Row (Clean and isolated on the second line)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            SuggestionChip(
+                                onClick = { },
+                                label = { Text(account.accountType.name) }
+                            )
+                            SuggestionChip(
+                                onClick = { },
+                                label = { Text(account.accountCategory.name) },
+                                colors = SuggestionChipDefaults.suggestionChipColors(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                )
+                            )
+                        }
+
+                        // 3. Additional Info
                         if (account.additionalInfo.isNotBlank()) {
                             Text(
                                 text = account.additionalInfo,

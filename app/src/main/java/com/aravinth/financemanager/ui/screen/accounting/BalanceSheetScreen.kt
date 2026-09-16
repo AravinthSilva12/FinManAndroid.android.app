@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,6 +32,10 @@ fun BalanceSheetScreen(
     val currentFilter by viewModel.currentFilter.collectAsState()
     val showFilters = viewModel.showFilterChips
 
+    // Custom Date Picker State
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = System.currentTimeMillis())
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -53,29 +58,42 @@ fun BalanceSheetScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // --- FILTER CHIPS ---
+            // --- FILTER CHIPS & DATE PICKER ---
             AnimatedVisibility(visible = showFilters) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    FilterChip(
-                        selected = currentFilter == DateFilter.TODAY,
-                        onClick = { viewModel.setDateFilter(DateFilter.TODAY) },
-                        label = { Text("Today") }
-                    )
-                    FilterChip(
-                        selected = currentFilter == DateFilter.THIS_MONTH,
-                        onClick = { viewModel.setDateFilter(DateFilter.THIS_MONTH) },
-                        label = { Text("This Month") }
-                    )
-                    FilterChip(
-                        selected = currentFilter == DateFilter.ALL,
-                        onClick = { viewModel.setDateFilter(DateFilter.ALL) },
-                        label = { Text("All Time") }
-                    )
+                    // Group chips together on the left
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilterChip(
+                            selected = currentFilter == DateFilter.TODAY,
+                            onClick = { viewModel.setDateFilter(DateFilter.TODAY) },
+                            label = { Text("Today") }
+                        )
+                        FilterChip(
+                            selected = currentFilter == DateFilter.THIS_MONTH,
+                            onClick = { viewModel.setDateFilter(DateFilter.THIS_MONTH) },
+                            label = { Text("This Month") }
+                        )
+                        FilterChip(
+                            selected = currentFilter == DateFilter.ALL,
+                            onClick = { viewModel.setDateFilter(DateFilter.ALL) },
+                            label = { Text("All Time") }
+                        )
+                    }
+
+                    // Push calendar icon to the right
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select Date",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
 
@@ -162,6 +180,30 @@ fun BalanceSheetScreen(
                         )
                     }
                 }
+            }
+        }
+
+        // Custom Date Picker Dialog
+        if (showDatePicker) {
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let { selectedMillis ->
+                            viewModel.setCustomDateFilter(selectedMillis)
+                        }
+                        showDatePicker = false
+                    }) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text("Cancel")
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
             }
         }
     }

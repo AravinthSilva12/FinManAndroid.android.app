@@ -71,10 +71,13 @@ fun JournalScreen(
     targetTransactionId: Long = -1L,
     viewModel: AccountingViewModel = hiltViewModel()
 ) {
-    //Observer the reactive transactions and filter state from viewmodel:
+    // Observer the reactive transactions and filter state from viewmodel:
     val transactions by viewModel.transactions.collectAsState(initial = emptyList())
     val currentFilter by viewModel.currentFilter.collectAsState()
     var entryToDelete by remember { mutableStateOf<Accounting?>(null) }
+
+    // THE FIX: Hoist the state read to the top of the composable
+    val showFilters = viewModel.showFilterChips
 
     // Custom Date Picker State
     var showDatePicker by remember { mutableStateOf(false) }
@@ -87,7 +90,6 @@ fun JournalScreen(
         if (targetTransactionId != -1L) {
             val targetIndex = transactions.indexOfFirst { it.id == targetTransactionId }
             if (targetIndex >= 0) {
-                // Adjust index slightly if you want to account for the filter chip item at index 0
                 listState.animateScrollToItem(index = targetIndex + 1)
             }
         }
@@ -126,12 +128,10 @@ fun JournalScreen(
                         )
                     }
                 },
-
                 windowInsets = WindowInsets(top = 0.dp, bottom = 0.dp)
             )
         }
     ) { innerPadding ->
-        // ENTIRE SCREEN IS NOW ONE LAZYCOLUMN
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -141,7 +141,7 @@ fun JournalScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // FILTER SECTION AS THE FIRST SCROLLABLE ITEM
-            if(viewModel.showFilterChips) {
+            if (showFilters) { // Using the hoisted state here!
                 item {
                     Row(
                         modifier = Modifier
