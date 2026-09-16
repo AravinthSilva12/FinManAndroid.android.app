@@ -21,13 +21,17 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -37,6 +41,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -71,6 +76,10 @@ fun JournalScreen(
     val currentFilter by viewModel.currentFilter.collectAsState()
     var entryToDelete by remember { mutableStateOf<Accounting?>(null) }
 
+    // Custom Date Picker State
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = System.currentTimeMillis())
+
     val listState = rememberLazyListState()
 
     // Auto-scroll to target transaction index on launch
@@ -104,9 +113,15 @@ fun JournalScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { viewModel.toggleFilterVisibility()}) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = "Toggle Filters"
+                        )
+                    }
                     IconButton(onClick = { navController.navigate(Screen.HistoryScreen)}) {
                         Icon(
-                            imageVector = androidx.compose.material.icons.Icons.Default.History,
+                            imageVector = Icons.Default.History,
                             contentDescription = "View Full History"
                         )
                     }
@@ -126,28 +141,41 @@ fun JournalScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // FILTER SECTION AS THE FIRST SCROLLABLE ITEM
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    FilterChip(
-                        selected = currentFilter == DateFilter.ALL,
-                        onClick = { viewModel.setDateFilter(DateFilter.ALL) },
-                        label = { Text("All") }
-                    )
-                    FilterChip(
-                        selected = currentFilter == DateFilter.TODAY,
-                        onClick = { viewModel.setDateFilter(DateFilter.TODAY) },
-                        label = { Text("Today") }
-                    )
-                    FilterChip(
-                        selected = currentFilter == DateFilter.THIS_MONTH,
-                        onClick = { viewModel.setDateFilter(DateFilter.THIS_MONTH) },
-                        label = { Text("This Month") }
-                    )
+            if(viewModel.showFilterChips) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FilterChip(
+                                selected = currentFilter == DateFilter.ALL,
+                                onClick = { viewModel.setDateFilter(DateFilter.ALL) },
+                                label = { Text("All") }
+                            )
+                            FilterChip(
+                                selected = currentFilter == DateFilter.TODAY,
+                                onClick = { viewModel.setDateFilter(DateFilter.TODAY) },
+                                label = { Text("Today") }
+                            )
+                            FilterChip(
+                                selected = currentFilter == DateFilter.THIS_MONTH,
+                                onClick = { viewModel.setDateFilter(DateFilter.THIS_MONTH) },
+                                label = { Text("This Month") }
+                            )
+                        }
+
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Select Date",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
                 }
             }
 
@@ -206,6 +234,30 @@ fun JournalScreen(
                     }
                 }
             )
+        }
+
+        // Custom Date Picker Dialog
+        if (showDatePicker) {
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let { selectedMillis ->
+                            viewModel.setCustomDateFilter(selectedMillis)
+                        }
+                        showDatePicker = false
+                    }) {
+                        Text("OK")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) {
+                        Text("Cancel")
+                    }
+                }
+            ) {
+                DatePicker(state = datePickerState)
+            }
         }
     }
 }

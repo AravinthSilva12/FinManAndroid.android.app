@@ -1,5 +1,6 @@
 package com.aravinth.financemanager.ui.screen.accounting
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -41,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -60,6 +63,9 @@ fun CoaScreen(
     var categoryExpanded by remember { mutableStateOf(false) }
     var showTypeGuide by remember { mutableStateOf(false) }
     var showCategoryGuide by remember { mutableStateOf(false) }
+
+    // Required for triggering Toast messages in Compose
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -203,18 +209,39 @@ fun CoaScreen(
                         Text(text = account.accountName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            SuggestionChip(
-                                onClick = { },
-                                label = { Text(account.accountType.name) }
-                            )
-                            SuggestionChip(
-                                onClick = { },
-                                label = { Text(account.accountCategory.name) },
-                                colors = SuggestionChipDefaults.suggestionChipColors(
-                                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        // Layout updated to align Delete button to the end
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                SuggestionChip(
+                                    onClick = { },
+                                    label = { Text(account.accountType.name) }
                                 )
-                            )
+                                SuggestionChip(
+                                    onClick = { },
+                                    label = { Text(account.accountCategory.name) },
+                                    colors = SuggestionChipDefaults.suggestionChipColors(
+                                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                                    )
+                                )
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    viewModel.deleteAccountIfUnused(account) { success, message ->
+                                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete Account",
+                                    tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f)
+                                )
+                            }
                         }
 
                         if (account.additionalInfo.isNotBlank()) {

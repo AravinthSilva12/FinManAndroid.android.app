@@ -49,4 +49,8 @@ class RoomAccountingRepository @Inject constructor(
             entities.map {it.toDomain()}
         }
     }
+
+    suspend fun deleteAccount(account: ChartOfAccount) {
+        dao.deleteAccount(account.toEntity())
+    }
 }

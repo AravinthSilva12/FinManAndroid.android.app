@@ -26,12 +26,13 @@ import com.aravinth.financemanager.domain.usecase.GetTrialBalanceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
 
-enum class DateFilter { TODAY, THIS_MONTH, ALL}
+enum class DateFilter { TODAY, THIS_MONTH, ALL, CUSTOM_DATE } // Added CUSTOM_DATE
 
 @HiltViewModel
 class AccountingViewModel @Inject constructor(
@@ -51,6 +52,7 @@ class AccountingViewModel @Inject constructor(
     //Filter State:
     val currentFilter = MutableStateFlow(DateFilter.ALL)
     var showFilterChips by mutableStateOf(false)
+    var customFilterDateMillis by mutableLongStateOf(System.currentTimeMillis()) // Custom date state
 
     //Transaction form state:
     var amountInput by mutableStateOf("")
@@ -97,6 +99,10 @@ class AccountingViewModel @Inject constructor(
                 getTransactionsUseCase(startDate = start, endDate = end)
             }
             DateFilter.ALL -> getTransactionsUseCase()
+            DateFilter.CUSTOM_DATE -> { // Handle custom date query
+                val (start, end) = getCustomDayRange(customFilterDateMillis)
+                getTransactionsUseCase(startDate = start, endDate = end)
+            }
         }
     }
 
@@ -112,6 +118,10 @@ class AccountingViewModel @Inject constructor(
                 getBalanceSheetUseCase(startDate = start, endDate = end)
             }
             DateFilter.ALL -> getBalanceSheetUseCase()
+            DateFilter.CUSTOM_DATE -> {
+                val (start, end) = getCustomDayRange(customFilterDateMillis)
+                getBalanceSheetUseCase(startDate = start, endDate = end)
+            }
         }
     }
 
@@ -124,6 +134,11 @@ class AccountingViewModel @Inject constructor(
     //Filter logic:
     fun setDateFilter(filter: DateFilter) {
         currentFilter.value = filter
+    }
+
+    fun setCustomDateFilter(dateMillis: Long) {
+        customFilterDateMillis = dateMillis
+        currentFilter.value = DateFilter.CUSTOM_DATE
     }
 
     fun toggleFilterVisibility() {
@@ -164,6 +179,22 @@ class AccountingViewModel @Inject constructor(
         return Pair(start, end)
     }
 
+    private fun getCustomDayRange(dateMillis: Long): Pair<Long, Long> {
+        val calendar = Calendar.getInstance()
+        calendar.timeInMillis = dateMillis
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val start = calendar.timeInMillis
+
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+        return Pair(start, calendar.timeInMillis)
+    }
+
     //COA function:
     fun onCoaNameChange(name: String) { coaNameInput = name }
     fun onCoaTypeChange(type: AccountType) { coaTypeInput = type }
@@ -182,6 +213,8 @@ class AccountingViewModel @Inject constructor(
                 accountRepository.insertAccount(newAccount)
                 coaNameInput = ""
                 coaInfoInput = ""
+                coaCategoryInput = AccountCategory.CURRENT_ASSET
+                coaTypeInput = AccountType.ASSET
             }
         }
     }
@@ -263,6 +296,22 @@ class AccountingViewModel @Inject constructor(
     fun onCloseAccountingPeriod(closingDateMillis: Long = System.currentTimeMillis()) {
         viewModelScope.launch {
             closeAccountingPeriodUseCase(closingDateMillis)
+        }
+    }
+
+    fun deleteAccountIfUnused(account: ChartOfAccount, onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            val allTransactions = getTransactionsUseCase().first()
+
+            val isUsed = allTransactions.any {
+                it.debitAccount == account.accountName || it.creditAccount == account.accountName
+            }
+            if (!isUsed) {
+                accountRepository.deleteAccount(account)
+                onResult(true, "Account deleted successfully.")
+            } else {
+                onResult(false, "Cannot delete: Account is tied to existing transactions.")
+            }
         }
     }
 }

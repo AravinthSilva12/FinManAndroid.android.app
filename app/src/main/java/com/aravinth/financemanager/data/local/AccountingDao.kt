@@ -33,4 +33,7 @@ interface AccountingDao {
 
     @Query("SELECT * FROM coa_table ORDER BY accountName ASC")
     fun getAllAccounts(): Flow<List<ChartOfAccountEntity>>
+
+    @Delete
+    suspend fun deleteAccount(account: ChartOfAccountEntity)
 }

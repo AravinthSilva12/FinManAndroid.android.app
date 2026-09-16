@@ -3,14 +3,15 @@ package com.aravinth.financemanager.ui.screen.accounting
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan // Required for the full-width item
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Balance
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.LockReset
-import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,12 +34,10 @@ fun FinancialReportScreen(
 ) {
     var showCloseDialog by remember { mutableStateOf(false) }
 
-    // 1. Setup Snackbar and Coroutine Scope
     val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        // 2. Attach the SnackbarHost to the Scaffold
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             TopAppBar(
@@ -51,77 +50,82 @@ fun FinancialReportScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        // ENTIRE SCREEN IS NOW ONE SCROLLABLE GRID
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(top = 24.dp, bottom = 32.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // --- THE REPORTS GRID DASHBOARD ---
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    ReportDashboardCard(
-                        title = "Trial Balance",
-                        icon = Icons.Default.AccountBalanceWallet,
-                        onClick = { navController.navigate(Screen.TrialBalance) }
+            item {
+                ReportDashboardCard(
+                    title = "Trial Balance",
+                    icon = Icons.Default.Balance,
+                    onClick = { navController.navigate(Screen.TrialBalance) }
+                )
+            }
+            item {
+                ReportDashboardCard(
+                    title = "Income Statement",
+                    icon = Icons.Default.EditNote,
+                    onClick = { navController.navigate(Screen.IncomeStatement) }
+                )
+            }
+            item {
+                ReportDashboardCard(
+                    title = "Balance Sheet",
+                    icon = Icons.Default.AccountBalance,
+                    onClick = { navController.navigate(Screen.BalanceSheetScreen) }
+                )
+            }
+
+            // POST-CLOSING ACTION SECTION (Spans full width)
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp), // Acts as the spacer from the grid above
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    HorizontalDivider(modifier = Modifier.padding(bottom = 24.dp).padding(horizontal = 8.dp))
+
+                    Text(
+                        text = "Year-End Operations",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
-                }
-                item {
-                    ReportDashboardCard(
-                        title = "Income Statement",
-                        icon = Icons.Default.PieChart,
-                        onClick = { navController.navigate(Screen.IncomeStatement) }
-                    )
-                }
-                item {
-                    ReportDashboardCard(
-                        title = "Balance Sheet",
-                        icon = Icons.Default.AccountBalance,
-                        onClick = { navController.navigate(Screen.BalanceSheetScreen) } // Updated Route
+
+                    Button(
+                        onClick = { showCloseDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(Icons.Default.LockReset, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                        Text("Close Financial Year", style = MaterialTheme.typography.titleMedium)
+                    }
+                    Text(
+                        text = "Generates closing journal entries to zero out temporary accounts.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
-
-            // --- POST-CLOSING ACTION SECTION ---
-            Spacer(modifier = Modifier.height(24.dp))
-            HorizontalDivider(modifier = Modifier.padding(bottom = 16.dp))
-
-            Text(
-                text = "Year-End Operations",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            Button(
-                onClick = { showCloseDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(Icons.Default.LockReset, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                Text("Close Financial Year", style = MaterialTheme.typography.titleMedium)
-            }
-            Text(
-                text = "Generates closing journal entries to zero out temporary accounts.",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                textAlign = TextAlign.Center
-            )
         }
 
         // --- CONFIRMATION DIALOG ---
@@ -135,7 +139,6 @@ fun FinancialReportScreen(
                 confirmButton = {
                     Button(
                         onClick = {
-                            // 3. Close books, dismiss dialog, and show Snackbar
                             viewModel.onCloseAccountingPeriod()
                             showCloseDialog = false
 
