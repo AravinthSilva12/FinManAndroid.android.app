@@ -98,16 +98,16 @@ This separation keeps business logic independent from UI and data-storage implem
 
 ## 🛠️ Tech Stack
 
-| Technology | Usage |
-|---|---|
-| **Kotlin** | Primary programming language |
-| **Jetpack Compose** | Declarative UI framework |
-| **Android SDK** | Native Android development |
-| **Room** | Local database / persistence |
-| **Hilt** | Dependency Injection |
-| **Coroutines** | Asynchronous programming |
-| **Type-safe Navigation** | Application navigation |
-| **Git & GitHub** | Version control |
+| Technology               | Usage                        |
+|--------------------------|------------------------------|
+| **Kotlin**               | Primary programming language |
+| **Jetpack Compose**      | Declarative UI framework     |
+| **Android SDK**          | Native Android development   |
+| **Room**                 | Local database / persistence |
+| **Hilt**                 | Dependency Injection         |
+| **Coroutines**           | Asynchronous programming     |
+| **Type-safe Navigation** | Application navigation       |
+| **Git & GitHub**         | Version control              |
 
 ---
 
