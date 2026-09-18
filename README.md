@@ -37,29 +37,70 @@ Future improvements :
    *Adding Export menu inside Report screen to export the income statements as pdf and Date wise selection of entry and pending modules of Assets and Budgeting. 
    *Improved UI with better colors and themes for UI components. *Rest API integration for remote data transferring.
 
-### Screenshots
-## ![Accounting Main] screenshots/AccountingMainScreen.jpeg
-## ![Recent transactions] screenshots/AccountingMainScreen.RecentTransaction.jpeg
-## ![Add transaction form] screenshots/AddTransactionScreen.jpeg
-## ![Add transaction form - save] screenshots/AddTransactionScreen2.jpeg
-## ![Chart of accounts] screenshots/CharOfAccountsScreen.jpeg
-## ![COA list] screenshots/ChartOfAccountsScreen2.jpeg
-## ![Journal Entries] screenshots/JournalEntriesScreen.jpeg
-## ![Transaction history] screenshots/TransactionHistoryScreen.jpeg
-## ![Ledger] screenshots/LedgerScreen.jpeg
-## ![Report screen] screenshots/ReportScreen.jpeg
-## ![Trial balance screen] screenshots/TrialBalanceScreen.jpeg
-## ![T account] screenshots/TAccountScreen.jpeg
-## ![Income statement] screenshots/IncomeStatementScreen.jpeg
-## ![Income statement2] screenshots/IncomeStatementScreen2.jpeg
-## ![BalanceSheet] screenshots/BalanceSheetScreen.jpeg
-## ![BalanceSheet2] screenshots/BalanceSheetScreen2.jpeg
-## ![Post trial balance button] screenshots/PostTrialBalancingButton.jpeg
-## ![Post trial balance confirmation] screenshots/PostTrialBalancingConfirmDialog.jpeg
-## ![Home tab] screenshots/HomeScreen.jpeg
-## ![Assets tab] screenshots/AssetsScreen.jpeg
-## ![Budgeting tab] screenshots/BudgetingScreen.jpeg
+## Screenshots
 
+### Accounting Main
+![Accounting Main](screenshots/AccountingMainScreen.jpeg)
+
+### Recent Transactions
+![Recent Transactions](screenshots/AccountingMainScreen.RecentTransaction.jpeg)
+
+### Add Transaction Form
+![Add Transaction Form](screenshots/AddTransactionScreen.jpeg)
+
+### Add Transaction Form - Save
+![Add Transaction Form - Save](screenshots/AddTransactionScreen2.jpeg)
+
+### Chart of Accounts
+![Chart of Accounts](screenshots/CharOfAccountsScreen.jpeg)
+
+### COA List
+![COA List](screenshots/ChartOfAccountsScreen2.jpeg)
+
+### Journal Entries
+![Journal Entries](screenshots/JournalEntriesScreen.jpeg)
+
+### Transaction History
+![Transaction History](screenshots/TransactionHistoryScreen.jpeg)
+
+### Ledger
+![Ledger](screenshots/LedgerScreen.jpeg)
+
+### Report Screen
+![Report Screen](screenshots/ReportScreen.jpeg)
+
+### Trial Balance
+![Trial Balance](screenshots/TrialBalanceScreen.jpeg)
+
+### T Account
+![T Account](screenshots/TAccountScreen.jpeg)
+
+### Income Statement
+![Income Statement](screenshots/IncomeStatementScreen.jpeg)
+
+### Income Statement - Additional View
+![Income Statement 2](screenshots/IncomeStatementScreen2.jpeg)
+
+### Balance Sheet
+![Balance Sheet](screenshots/BalanceSheetScreen.jpeg)
+
+### Balance Sheet - Additional View
+![Balance Sheet 2](screenshots/BalanceSheetScreen2.jpeg)
+
+### Post Trial Balance
+![Post Trial Balance Button](screenshots/PostTrialBalancingButton.jpeg)
+
+### Post Trial Balance Confirmation
+![Post Trial Balance Confirmation](screenshots/PostTrialBalancingConfirmDialog.jpeg)
+
+### Home
+![Home Tab](screenshots/HomeScreen.jpeg)
+
+### Assets
+![Assets Tab](screenshots/AssetsScreen.jpeg)
+
+### Budgeting
+![Budgeting Tab](screenshots/BudgetingScreen.jpeg)
 
 
 
